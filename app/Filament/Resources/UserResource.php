@@ -2,16 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
-use Filament\Forms;
+use App\Filament\Resources\UserResource\Pages\ManageUsers;
+use App\Filament\Widgets\StatsOverview;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
@@ -19,40 +25,45 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
+    protected static ?string $activeNavigationIcon = 'heroicon-s-users';
+    
     public static function getEloquentQuery(): Builder
     {
         if (auth()->guard('web')->user()->role == 0) {
-            return parent::getEloquentQuery()->where('role', 1);
+            return parent::getEloquentQuery()->where('role', '!=', 0);
         } else {
             return parent::getEloquentQuery()->where('role', 2);
         }
     }
 
-
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('username')
+                TextInput::make('username')
+                    ->placeholder('johndoe')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
+                    ->label('Full Name')
+                    ->placeholder('John Doe')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('email')
+                TextInput::make('email')
                     ->email()
+                    ->placeholder('johndoe@mail.com')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
+                TextInput::make('password')
                     ->password()
+                    ->placeholder('Type your password here')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('role')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\Toggle::make('status')
+                Select::make('role')
+                    ->options([
+                        1 => 'Teacher',
+                        2 => 'Student',
+                    ])
                     ->required(),
             ]);
     }
@@ -61,18 +72,13 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                // Tables\Columns\TextColumn::make('username')
-                //     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable()
                     ->copyable()
                     ->copyMessage('Email copied to clipboard'),
-                // Tables\Columns\TextColumn::make('email_verified_at')
-                //     ->dateTime()
-                //     ->sortable(),
-                Tables\Columns\TextColumn::make('role')
+                TextColumn::make('role')
                     ->numeric()
                     ->sortable()
                     ->badge()
@@ -86,13 +92,14 @@ class UserResource extends Resource
                         1 => 'Teacher',
                         2 => 'Student',
                     }),
-                Tables\Columns\IconColumn::make('status')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
+                IconColumn::make('status')
+                    ->boolean()
+                    ->sortable(),
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -101,13 +108,13 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -115,7 +122,7 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageUsers::route('/'),
+            'index' => ManageUsers::route('/'),
         ];
     }
 }
