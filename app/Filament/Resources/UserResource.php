@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Models\User;
 use App\Filament\Resources\UserResource\Pages\ManageUsers;
-use App\Filament\Widgets\StatsOverview;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -40,31 +39,7 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('username')
-                    ->placeholder('johndoe')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('name')
-                    ->label('Full Name')
-                    ->placeholder('John Doe')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('email')
-                    ->email()
-                    ->placeholder('johndoe@mail.com')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('password')
-                    ->password()
-                    ->placeholder('Type your password here')
-                    ->required()
-                    ->maxLength(255),
-                Select::make('role')
-                    ->options([
-                        1 => 'Teacher',
-                        2 => 'Student',
-                    ])
-                    ->required(),
+                //
             ]);
     }
 
@@ -108,8 +83,21 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()
+                    ->form([
+                        TextInput::make('username')->placeholder('johndoe')->required()->maxLength(255),
+                        TextInput::make('name')->label('Full Name')->placeholder('John Doe')->required()->maxLength(255),
+                        TextInput::make('email')->email()->placeholder('johndoe@mail.com')->required()->maxLength(255),
+                        Select::make('role')->options(['1' => 'Teacher','2' => 'Student'])->required(),
+                    ]),
+                EditAction::make()
+                    ->form([
+                        TextInput::make('username')->placeholder('johndoe')->required()->maxLength(255),
+                        TextInput::make('name')->label('Full Name')->placeholder('John Doe')->required()->maxLength(255),
+                        TextInput::make('email')->email()->placeholder('johndoe@mail.com')->required()->maxLength(255),
+                        // TextInput::make('password')->password()->placeholder('Type your password here')->required()->maxLength(255),
+                        Select::make('role')->options(['1' => 'Teacher','2' => 'Student'])->required(),
+                    ]),
                 DeleteAction::make(),
             ])
             ->bulkActions([
