@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('description');
             $table->binary('file');
-            $table->foreignId('subject_id')->constrained('subjects');
-            $table->foreignId('teacher_id')->constrained('users');
+            $table->foreignId('classroom_id')->constrained('classrooms');
             $table->timestamps();
         });
     }
