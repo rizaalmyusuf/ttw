@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('subjects', function (Blueprint $table) {
             $table->after('teacher_id', function (Blueprint $table) {
                 $table->foreignId('topic_id')->constrained('topics');
-                $table->foreignId('class_id')->constrained('classes');
+                $table->foreignId('classroom_id')->constrained('classrooms');
             });
         });
     }
