@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\UserResource\Pages;
+namespace App\Filament\Admin\Resources\UserResource\Pages;
 
 use App\Models\User;
 use Filament\Forms\Form;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
-use App\Filament\Resources\UserResource;
+use App\Filament\Admin\Resources\UserResource;
 use Doctrine\DBAL\Schema\View;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;

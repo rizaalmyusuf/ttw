@@ -20,15 +20,15 @@ class User extends Authenticatable implements FilamentUser
      *
      * @var list<string>
      */
-    // protected $fillable = [
-    //     'username',
-    //     'name',
-    //     'email',
-    //     'password',
-    //     'role',
-    // ];
+    protected $fillable = [
+        'username',
+        'name',
+        'email',
+        'password',
+        'role',
+    ];
 
-    protected $guarded;
+    // protected $guarded;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -37,6 +37,7 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $hidden = [
         'password',
+        'status',
         'remember_token',
     ];
 
@@ -55,6 +56,23 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->role === 0; // || $this->role === 1;
+        if($panel->getId() === 'app' && $this->role === 0) {
+            return false;
+        }elseif($panel->getId() === 'app' && $this->role != 0) {
+            return true;
+        }
+
+        if($panel->getId() === 'admin' && $this->role != 0) {
+            return false;
+        }elseif($panel->getId() === 'admin' && $this->role === 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function classroom()
+    {
+        return $this->hasMany(Classroom::class);
     }
 }

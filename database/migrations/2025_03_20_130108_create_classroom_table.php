@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('subject');
             $table->foreignId('teacher_id')->constrained('users');
-            $table->foreignId('student_id')->constrained('users');
+            $table->foreignId('student_id')->constrained('users')->nullable();
             $table->timestamps();
         });
     }

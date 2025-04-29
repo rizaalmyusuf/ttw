@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Admin\Resources;
 
 use App\Models\User;
-use App\Filament\Resources\UserResource\Pages\ManageUsers;
+use App\Filament\Admin\Resources\UserResource\Pages\ManageUsers;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
