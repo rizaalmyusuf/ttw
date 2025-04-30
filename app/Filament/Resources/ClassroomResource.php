@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\Layout\Grid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -22,6 +23,17 @@ class ClassroomResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?string $activeNavigationIcon = 'heroicon-s-academic-cap';
+
+    protected static string $view = 'filament.pages.card-view';
+
+    public static function getEloquentQuery(): Builder
+    {
+        if (auth()->guard('web')->user()->role == 1) {
+            return parent::getEloquentQuery()->where('teacher_id', auth()->guard('web')->user()->id);
+        } else {
+            return parent::getEloquentQuery()->where('student_id', auth()->guard('web')->user()->id);
+        }
+    }
 
     public static function form(Form $form): Form
     {
@@ -35,20 +47,27 @@ class ClassroomResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Grid::make(1)
+                    ->schema([
+                        Tables\Columns\TextColumn::make('name')
+                            ->label('Classroom Name')
+                            ->description(fn (Classroom $record): string => $record->subject)
+                            ->color('primary'),
+                    ]),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\ViewAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->paginated(false);
+            // ->bulkActions([
+            //     Tables\Actions\BulkActionGroup::make([
+            //         Tables\Actions\DeleteBulkAction::make(),
+            //     ]),
+            // ]);
     }
 
     public static function getRelations(): array

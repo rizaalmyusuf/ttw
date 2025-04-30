@@ -23,7 +23,7 @@ class ListClassrooms extends ListRecords
                     ->color('primary')
                     ->fillForm(fn (array $data): array => [
                         'token' => Str::random(5),
-                        'teacher_id' => auth()->guard('web')->user()->name,
+                        'teacher_id' => auth()->guard('web')->user()->id,
                     ])
                     ->form([
                         TextInput::make('token')
@@ -49,6 +49,7 @@ class ListClassrooms extends ListRecords
                             ->readOnly()
                             ->required()
                     ])
+                    ->createAnother(false)
                     ->modalIcon('heroicon-s-squares-plus')
                     ->modalHeading('Create Classroom')
                     ->modalSubheading('Create the classroom to make students join the classroom')
