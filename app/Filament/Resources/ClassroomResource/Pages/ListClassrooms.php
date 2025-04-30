@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\ClassroomResource\Pages;
 
+use App\Filament\Resources\ClassroomResource;
+use App\Models\Classroom;
 use Filament\Actions\CreateAction;
 use Illuminate\Support\Str;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Resources\ClassroomResource;
 
 class ListClassrooms extends ListRecords
 {
@@ -22,26 +23,29 @@ class ListClassrooms extends ListRecords
                     ->color('primary')
                     ->fillForm(fn (array $data): array => [
                         'token' => Str::random(5),
-                        'teacher_id' => auth()->guard('web')->user()->id,
+                        'teacher_id' => auth()->guard('web')->user()->name,
                     ])
                     ->form([
                         TextInput::make('token')
+                            ->label('Classroom Token')
                             ->readOnly()
-                            ->hidden()
                             ->required()
                             ->unique()
                             ->maxLength(255)
                             ->placeholder('Classroom Token'),
                         TextInput::make('name')
+                            ->label('Classroom Name')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Classroom Name'),
+                            ->placeholder('Classroom Name')
+                            ->autofocus(),
                         TextInput::make('subject')
+                            ->label('Subject')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Subject'),
                         TextInput::make('teacher_id')
-                            ->hidden()
+                            ->label('Teacher Name')
                             ->readOnly()
                             ->required()
                     ])
@@ -49,7 +53,7 @@ class ListClassrooms extends ListRecords
                     ->modalHeading('Create Classroom')
                     ->modalSubheading('Create the classroom to make students join the classroom')
                     ->modalButton('Create')
-                    ->modalWidth('lg')
+                    ->modalWidth('lg')                    
             ];
         }elseif (auth()->guard('web')->user()->role === 2) {
             return [
