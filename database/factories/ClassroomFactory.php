@@ -18,7 +18,7 @@ class ClassroomFactory extends Factory
     public function definition(): array
     {
         return [
-            'token' => Str::random(5),
+            'token' => Str::random(7),
             'name' => fake()->company(),
             'subject' => fake()->word(),
             'teacher_id' => rand(2,4),
