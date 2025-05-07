@@ -54,7 +54,7 @@ class ListClassrooms extends ListRecords
                     ->modalHeading('Create Classroom')
                     ->modalSubheading('Create the classroom to make students join the classroom')
                     ->modalButton('Create')
-                    ->modalWidth('lg')                    
+                    ->modalWidth('lg')
             ];
         }elseif (auth()->guard('web')->user()->role === 2) {
             return [

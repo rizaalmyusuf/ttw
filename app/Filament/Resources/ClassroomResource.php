@@ -47,7 +47,7 @@ class ClassroomResource extends Resource
     {
         return $table
             ->columns([
-                Grid::make(1)
+                Grid::make(3)
                     ->schema([
                         Tables\Columns\TextColumn::make('name')
                             ->label('Classroom Name')
