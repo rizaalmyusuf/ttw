@@ -6,6 +6,7 @@ use App\Filament\Resources\ClassroomResource;
 use Filament\Actions;
 use Filament\Infolists;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Support\Enums\ActionSize;
@@ -59,9 +60,8 @@ class ViewClassroom extends ViewRecord
                         ->label('Delete')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalIcon('heroicon-s-trash')
                         ->modalHeading('Delete Classroom')
-                        ->modalSubheading('Are you sure you want to delete this classroom?')
+                        ->modalDescription('Are you sure want to delete this classroom?')
                 ])
                 ->icon('heroicon-s-cog-8-tooth')
                 ->size(ActionSize::Large)
@@ -76,8 +76,6 @@ class ViewClassroom extends ViewRecord
     public function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         if (auth()->guard('web')->user()->role === 1) {
-
-
             return
                 $infolist                   
                     ->name('Classroom')
@@ -91,7 +89,17 @@ class ViewClassroom extends ViewRecord
                                             ->label('Token')
                                             ->badge()
                                             ->color('warning')
-                                            ->icon('heroicon-s-key'),
+                                            ->icon('heroicon-s-key')
+                                            ->action(
+                                                Infolists\Components\Actions\Action::make('view-token')
+                                                    ->requiresConfirmation()
+                                                    ->modalHeading($this->record->getAttributes()['token'])
+                                                    ->modalDescription('This is the token for this classroom')
+                                                    ->modalSubmitAction(false)
+                                                    ->modalCancelAction(false)
+                                                    ->modalIcon('heroicon-s-key')
+                                                    ->modalWidth('lg')
+                                            )
                                     ]),
                                 Infolists\Components\Tabs\Tab::make('Topic Works')
                                     ->icon('heroicon-s-clipboard-document-list')
@@ -101,7 +109,11 @@ class ViewClassroom extends ViewRecord
                                 Infolists\Components\Tabs\Tab::make('Students')
                                     ->icon('heroicon-s-users')
                                     ->schema([
-                                        
+                                        // Infolists\Components\RepeatableEntry::make('students')
+                                        //     ->schema([
+                                        //         Infolists\Components\TextEntry::make('name')
+                                        //     ])
+                                        //     ->columns(1)
                                     ])
                             ])
                         
