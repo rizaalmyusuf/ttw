@@ -29,7 +29,7 @@ class ClassroomResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         if (auth()->guard('web')->user()->role == 1) {
-            return parent::getEloquentQuery()->where('teacher_id', auth()->guard('web')->user()->id);
+            return parent::getEloquentQuery()->where('teacher_id', auth()->guard('web')->user()->id)->groupBy('token');
         } else {
             return parent::getEloquentQuery()->where('student_id', auth()->guard('web')->user()->id);
         }

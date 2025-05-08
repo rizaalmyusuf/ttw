@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ClassroomResource\Pages;
 
 use App\Filament\Resources\ClassroomResource;
+use Doctrine\DBAL\Schema\Table;
 use Filament\Actions;
 use Filament\Infolists;
 use Filament\Forms\Components\TextInput;
@@ -10,6 +11,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Support\Enums\ActionSize;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Contracts\Support\Htmlable;
 
 class ViewClassroom extends ViewRecord
@@ -76,6 +78,8 @@ class ViewClassroom extends ViewRecord
     public function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         if (auth()->guard('web')->user()->role === 1) {
+            // dd($this->record);
+
             return
                 $infolist                   
                     ->name('Classroom')
@@ -109,13 +113,18 @@ class ViewClassroom extends ViewRecord
                                 Infolists\Components\Tabs\Tab::make('Students')
                                     ->icon('heroicon-s-users')
                                     ->schema([
-                                        // Infolists\Components\RepeatableEntry::make('students')
-                                        //     ->schema([
-                                        //         Infolists\Components\TextEntry::make('name')
-                                        //     ])
-                                        //     ->columns(1)
+                                        Infolists\Components\RepeatableEntry::make('students')    
+                                            ->schema([
+                                                Infolists\Components\TextEntry::make('name')
+                                                    ->label('Name')
+                                                    ->icon('heroicon-s-user'),
+                                                Infolists\Components\TextEntry::make('email')
+                                                    ->label('Email')
+                                                    ->icon('heroicon-s-envelope'),
+                                            ])
                                     ])
                             ])
+                            ->columnSpan(2)
                         
                     ]);
         }
