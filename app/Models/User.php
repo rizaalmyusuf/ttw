@@ -8,6 +8,7 @@ use Filament\Panel;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements FilamentUser
@@ -71,7 +72,7 @@ class User extends Authenticatable implements FilamentUser
         return false;
     }
 
-    public function classroom()
+    public function classroom(): HasMany
     {
         return $this->hasMany(Classroom::class);
     }

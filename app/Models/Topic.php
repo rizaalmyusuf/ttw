@@ -23,7 +23,7 @@ class Topic extends Model
         return $this->belongsTo(Classroom::class, 'classroom_id');
     }
 
-    public function answer()
+    public function answers()
     {
         return $this->hasMany(Answer::class);
     }

@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Classroom extends Model
 {
@@ -29,12 +30,22 @@ class Classroom extends Model
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    public function students()
+    public function teachers()
     {
-        return $this->belongsToMany(User::class, 'student_id');
+        return $this->hasMany(User::class);
     }
 
-    public function topic()
+    public function student()
+    {
+        return $this->belongsTo(User::class, 'student_id');
+    }
+
+    public function students()
+    {
+        
+    }
+    
+    public function topics()
     {
         return $this->hasMany(Topic::class);
     }
