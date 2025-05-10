@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Classroom extends Model
 {
@@ -30,9 +31,9 @@ class Classroom extends Model
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    public function teachers()
+    public function teachers(): MorphToMany
     {
-        return $this->hasMany(User::class);
+        return $this->morphedByMany(User::class, 'classroomable');
     }
 
     public function student()
@@ -40,9 +41,9 @@ class Classroom extends Model
         return $this->belongsTo(User::class, 'student_id');
     }
 
-    public function students()
+    public function students(): MorphToMany
     {
-        
+        return $this->morphedByMany(User::class, 'classroomable');
     }
     
     public function topics()

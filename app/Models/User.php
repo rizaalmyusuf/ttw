@@ -9,6 +9,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements FilamentUser
@@ -72,8 +73,8 @@ class User extends Authenticatable implements FilamentUser
         return false;
     }
 
-    public function classroom(): HasMany
+    public function classrooms(): MorphToMany
     {
-        return $this->hasMany(Classroom::class);
+        return $this->morphToMany(Classroom::class, 'classroomable');
     }
 }
