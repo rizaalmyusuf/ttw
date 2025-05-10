@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('classroomables', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('classroom_id')->constrained('classrooms');
             $table->foreignId('classroomable_id')->constrained('users');
             $table->string('classroomable_type'); // 'student' or 'teacher'
