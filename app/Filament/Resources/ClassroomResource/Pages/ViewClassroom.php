@@ -3,15 +3,12 @@
 namespace App\Filament\Resources\ClassroomResource\Pages;
 
 use App\Filament\Resources\ClassroomResource;
-use Doctrine\DBAL\Schema\Table;
 use Filament\Actions;
 use Filament\Infolists;
-use Filament\Forms\Components\TextInput;
-use Filament\Infolists\Infolist;
+use Filament\Forms;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Support\Enums\ActionSize;
-use Filament\Tables\Columns\TextColumn;
 use Illuminate\Contracts\Support\Htmlable;
 
 class ViewClassroom extends ViewRecord
@@ -24,8 +21,14 @@ class ViewClassroom extends ViewRecord
 
     public function getTitle(): string | Htmlable
     {   
-        if($this->record->getAttributes()) {
-            return $this->record->getAttributes()['name'];
+        if($this->record) {
+            if($this->record->classroom) {
+                return $this->record->classroom->name;
+            }
+            if($this->record->getAttributes()['name']) {
+                return $this->record->getAttributes()['name'];
+            }
+            // return $this->record->getAttributes()['name'];
         }
 
         return __('filament-panels::resources/pages/view-record.title', [
@@ -43,13 +46,13 @@ class ViewClassroom extends ViewRecord
                         ->label('Edit')
                         ->color('warning')
                         ->form([
-                            TextInput::make('name')
+                            Forms\Components\TextInput::make('name')
                                 ->label('Classroom Name')
                                 ->required()
                                 ->maxLength(255)
                                 ->placeholder('Classroom Name')
                                 ->autofocus(),
-                            TextInput::make('subject')
+                            Forms\Components\TextInput::make('subject')
                                 ->label('Subject')
                                 ->required()
                                 ->maxLength(255)
@@ -78,8 +81,6 @@ class ViewClassroom extends ViewRecord
     public function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         if (auth()->guard('web')->user()->role === 1) {
-            // dd($this->record);
-
             return
                 $infolist                   
                     ->name('Classroom')
@@ -113,7 +114,8 @@ class ViewClassroom extends ViewRecord
                                 Infolists\Components\Tabs\Tab::make('Students')
                                     ->icon('heroicon-s-users')
                                     ->schema([
-                                        Infolists\Components\RepeatableEntry::make('students')    
+                                        Infolists\Components\RepeatableEntry::make('students')
+                                            ->label('')    
                                             ->schema([
                                                 Infolists\Components\TextEntry::make('name')
                                                     ->label('Name')
@@ -127,8 +129,34 @@ class ViewClassroom extends ViewRecord
                             ->columnSpan(2)
                         
                     ]);
+        }else{
+            return
+                $infolist
+                    ->name('Classroom')
+                    ->schema([
+                        Infolists\Components\Tabs::make('Tabs')
+                            ->tabs([
+                                Infolists\Components\Tabs\Tab::make('Topic Works')
+                                    ->icon('heroicon-s-clipboard-document-list')
+                                    ->schema([
+                                        
+                                    ]),
+                                // Infolists\Components\Tabs\Tab::make('Classmates')
+                                //     ->icon('heroicon-s-users')
+                                //     ->schema([
+                                //         Infolists\Components\RepeatableEntry::make('students')
+                                //             ->label('')    
+                                //             ->schema([
+                                //                 Infolists\Components\TextEntry::make('name')
+                                //                     ->label('Name')
+                                //                     ->icon('heroicon-s-user'),
+                                //             ])
+                                //     ])
+                            ])
+                            ->columnSpan(2)
+                        
+                    ]);
         }
-
         return $infolist;
     }
 

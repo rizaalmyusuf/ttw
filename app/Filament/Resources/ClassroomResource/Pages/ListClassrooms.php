@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\ClassroomResource\Pages;
 
+use App\Models;
 use App\Filament\Resources\ClassroomResource;
-use App\Models\Classroom;
-use Filament\Actions\CreateAction;
 use Illuminate\Support\Str;
+use Filament\Actions\CreateAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 
 class ListClassrooms extends ListRecords
@@ -52,8 +53,8 @@ class ListClassrooms extends ListRecords
                     ->createAnother(false)
                     ->modalIcon('heroicon-s-squares-plus')
                     ->modalHeading('Create Classroom')
-                    ->modalSubheading('Create the classroom to make students join the classroom')
-                    ->modalButton('Create')
+                    ->modalDescription('Create a classroom to make students join the classroom!')
+                    ->modalSubmitActionLabel('Create')
                     ->modalWidth('lg')
             ];
         }elseif (auth()->guard('web')->user()->role === 2) {
@@ -70,15 +71,45 @@ class ListClassrooms extends ListRecords
                     ])
                     ->createAnother(false)
                     ->action(function (array $data) {
-                        // Logic to join the classroom using the token
-                        // For example, you can use Classroom::where('token', $data['token'])->first();
-                        // and then attach the user to the classroom.
+                        
+                        $classroom = Models\Classroom::where('token', $data['token'])->first();
+
+                        if ($classroom === null) {
+                            Notification::make()
+                                ->title('Classroom not found!')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        if (Models\Classroomable::where('classroom_id', $classroom->id)
+                            ->where('classroomable_id', auth()->guard('web')->user()->id)
+                            ->where('classroomable_type', 'App\Models\User')
+                            ->exists()) {
+                            Notification::make()
+                                ->title('You are already a member of this classroom!')
+                                ->danger()
+                                ->send();
+                            return;
+                        }else{
+                            Models\Classroomable::create([
+                                'classroom_id' => $classroom->id,
+                                'classroomable_id' => auth()->guard('web')->user()->id,
+                                'classroomable_type' => 'App\Models\User',
+                            ]);
+
+                            Notification::make()
+                                ->title('Classroom joined successfully!')
+                                ->success()
+                                ->send();
+                            return;
+                        }
                     })
                     ->requiresConfirmation()
                     ->modalIcon('heroicon-s-squares-2x2')
                     ->modalHeading('Join Classroom')
-                    ->modalSubheading('Enter the classroom token to join')
-                    ->modalButton('Join')
+                    ->modalDescription('Enter the classroom token to join!')
+                    ->modalSubmitActionLabel('Join')
                     ->modalWidth('lg')
             ];
         }

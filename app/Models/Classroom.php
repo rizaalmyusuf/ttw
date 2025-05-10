@@ -36,11 +36,6 @@ class Classroom extends Model
         return $this->morphedByMany(User::class, 'classroomable');
     }
 
-    public function student()
-    {
-        return $this->belongsTo(User::class, 'student_id');
-    }
-
     public function students(): MorphToMany
     {
         return $this->morphedByMany(User::class, 'classroomable');

@@ -2,23 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Classroom;
+use App\Models;
 use App\Filament\Resources\ClassroomResource\Pages;
-use App\Filament\Resources\ClassroomResource\RelationManagers;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\Layout\Grid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ClassroomResource extends Resource
 {
-    protected static ?string $model = Classroom::class;
+    protected static ?string $model = Models\Classroom::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
@@ -31,11 +25,16 @@ class ClassroomResource extends Resource
         if (auth()->guard('web')->user()->role == 1) {
             return parent::getEloquentQuery()->where('teacher_id', auth()->guard('web')->user()->id)->groupBy('token');
         } else {
-            return parent::getEloquentQuery()->where('student_id', auth()->guard('web')->user()->id);
+            // return parent::getEloquentQuery()->where('student_id', auth()->guard('web')->user()->id);
+            return Models\Classroomable::query()
+                ->where('classroomable_id', auth()->guard('web')->user()->id)
+                ->with(['classroom'])
+                ->groupBy('classroom_id')
+                ->orderBy('created_at', 'desc');
         }
     }
 
-    public static function form(Form $form): Form
+    public static function form(Forms\Form $form): Forms\Form
     {
         return $form
             ->schema([
@@ -43,17 +42,31 @@ class ClassroomResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
-    {
+    public static function table(Tables\Table $table): Tables\Table
+    {   
+        if (auth()->guard('web')->user()->role == 1) {
+            return $table
+                ->columns([
+                    Tables\Columns\TextColumn::make('name')
+                        ->label('Classrooms')
+                        ->description(fn (Models\Classroom $record): string => $record->subject)
+                        ->color('primary'),
+                ])
+                ->paginated(false);
+        }else{
+            return $table
+                ->columns([
+                    Tables\Columns\TextColumn::make('classroom.name')
+                        ->label('Classrooms')
+                        ->description(fn (Models\Classroomable $record): string => $record->classroom->subject)
+                        ->color('primary'),
+                ])
+                ->paginated(false);
+        }
+
         return $table
             ->columns([
-                Grid::make(3)
-                    ->schema([
-                        Tables\Columns\TextColumn::make('name')
-                            ->label('Classroom Name')
-                            ->description(fn (Classroom $record): string => $record->subject)
-                            ->color('primary'),
-                    ]),
+                //
             ])
             ->filters([
                 //
