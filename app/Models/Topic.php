@@ -7,14 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Topic extends Model
 {
     protected $fillable = [
-        'name',
-        'slug',
+        'title',
         'description',
         'file',
+        'classroom_id',
     ];
 
     protected $hidden = [
-        'slug',
         'classroom_id',
     ];
 
