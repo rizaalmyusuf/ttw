@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\ClassroomResource\Pages;
 
-use App\Filament\Resources\ClassroomResource;
+use App\Models\Topic;
+use Faker\Provider\Lorem;
+use Filament\Forms;
 use Filament\Actions;
 use Filament\Infolists;
-use Filament\Forms;
-use Filament\Resources\Pages\ViewRecord;
-use Filament\Resources\Pages\Concerns\InteractsWithRecord;
+use Filament\Notifications;
 use Filament\Support\Enums\ActionSize;
+use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use App\Filament\Resources\ClassroomResource;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 
 class ViewClassroom extends ViewRecord
 {
@@ -109,7 +112,59 @@ class ViewClassroom extends ViewRecord
                                 Infolists\Components\Tabs\Tab::make('Topic Works')
                                     ->icon('heroicon-s-clipboard-document-list')
                                     ->schema([
-                                        
+                                        Infolists\Components\Actions::make([
+                                            Infolists\Components\Actions\Action::make('createTopic')
+                                                ->icon('heroicon-s-plus')
+                                                ->label('Add Topic')
+                                                ->requiresConfirmation()
+                                                ->form([
+                                                    Forms\Components\TextInput::make('title')
+                                                        ->label('Topic Title')
+                                                        ->required()
+                                                        ->maxLength(255)
+                                                        ->placeholder('Programming Language')
+                                                        ->autocapitalize('words'),
+                                                    Forms\Components\TextInput::make('description')
+                                                        ->label('Topic Description')
+                                                        ->required()
+                                                        ->maxLength(255)
+                                                        ->placeholder(Lorem::sentence(10)),
+                                                    Forms\Components\FileUpload::make('file')
+                                                        ->label('File')                                                        
+                                                        ->required(),
+                                                ])
+                                                ->action(function (array $data) {
+                                                    Topic::create([
+                                                        'title' => $data['title'],
+                                                        'description' => $data['description'],
+                                                        'file' => $data['file'],
+                                                        'classroom_id' => $this->record->getAttributes()['id'],
+                                                    ]);
+
+                                                    return Notifications\Notification::make()
+                                                        ->title('Topic Created')
+                                                        ->success()
+                                                        ->send();
+                                                })
+                                                ->modalIcon('heroicon-s-plus')
+                                                ->modalHeading('Add Topic')
+                                                ->modalDescription('Add a new topic to this classroom!')
+                                                ->modalWidth('2xl')
+                                        ]),
+
+                                        Infolists\Components\RepeatableEntry::make('topics')
+                                            ->label('')    
+                                            ->schema([
+                                                Infolists\Components\TextEntry::make('title')
+                                                    ->label('Title')
+                                                    ->icon('heroicon-s-document-text'),
+                                                Infolists\Components\TextEntry::make('description')
+                                                    ->label('Description')
+                                                    ->icon('heroicon-s-document-text'),
+                                                Infolists\Components\TextEntry::make('file')
+                                                    ->label('File')
+                                                    ->icon('heroicon-s-document-text'),
+                                            ])->columns(3)
                                     ]),
                                 Infolists\Components\Tabs\Tab::make('Students')
                                     ->icon('heroicon-s-users')
@@ -127,6 +182,7 @@ class ViewClassroom extends ViewRecord
                                     ])
                             ])
                             ->columnSpan(2)
+                            
                         
                     ]);
         }else{

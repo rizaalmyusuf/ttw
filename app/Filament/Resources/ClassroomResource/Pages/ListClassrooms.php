@@ -23,7 +23,7 @@ class ListClassrooms extends ListRecords
                     ->label('Create Classroom')
                     ->color('primary')
                     ->fillForm(fn (array $data): array => [
-                        'token' => Str::random(5),
+                        'token' => Str::random(7),
                         'teacher_id' => auth()->guard('web')->user()->id,
                     ])
                     ->form([
@@ -32,19 +32,18 @@ class ListClassrooms extends ListRecords
                             ->readOnly()
                             ->required()
                             ->unique()
-                            ->maxLength(255)
-                            ->placeholder('Classroom Token'),
+                            ->maxLength(7),
                         TextInput::make('name')
                             ->label('Classroom Name')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Classroom Name')
+                            ->placeholder('X TKI 1')
                             ->autofocus(),
                         TextInput::make('subject')
                             ->label('Subject')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Subject'),
+                            ->placeholder('Informatics'),
                         TextInput::make('teacher_id')
                             ->label('Teacher Name')
                             ->readOnly()
