@@ -2,17 +2,23 @@
 
 namespace App\Filament\Resources\ClassroomResource\Pages;
 
-use App\Models\Topic;
-use Faker\Provider\Lorem;
 use Filament\Forms;
+use Filament\Tables;
+use App\Models\Topic;
 use Filament\Actions;
 use Filament\Infolists;
+use Faker\Provider\Lorem;
 use Filament\Notifications;
+use Illuminate\Support\Str;
+use PhpParser\Node\Stmt\Echo_;
 use Filament\Support\Enums\ActionSize;
+use Filament\Support\Enums\FontWeight;
+use Illuminate\Support\Facades\Storage;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Resources\ClassroomResource;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
+use Filament\Support\Enums\Alignment;
 
 class ViewClassroom extends ViewRecord
 {
@@ -70,6 +76,16 @@ class ViewClassroom extends ViewRecord
                         ->requiresConfirmation()
                         ->modalHeading('Delete Classroom')
                         ->modalDescription('Are you sure want to delete this classroom?')
+                        ->action(function () {
+                            $this->record->delete();
+
+                            Notifications\Notification::make()
+                                ->title('Classroom Deleted')
+                                ->success()
+                                ->send();
+                            
+                            return redirect()->to('/classrooms');
+                        })
                 ])
                 ->icon('heroicon-s-cog-8-tooth')
                 ->size(ActionSize::Large)
@@ -107,7 +123,39 @@ class ViewClassroom extends ViewRecord
                                                     ->modalCancelAction(false)
                                                     ->modalIcon('heroicon-s-key')
                                                     ->modalWidth('lg')
-                                            )
+                                            ),
+                                            Infolists\Components\RepeatableEntry::make('topics')
+                                                ->contained(false)
+                                                ->schema([
+                                                    Infolists\Components\Section::make([
+                                                        Infolists\Components\TextEntry::make('title')
+                                                            ->label('')
+                                                            ->icon('heroicon-s-document-text')
+                                                            ->weight(FontWeight::Bold),
+                                                        Infolists\Components\TextEntry::make('created_at')
+                                                            ->label('')
+                                                            ->icon('heroicon-s-clock')
+                                                            ->since()
+                                                            ->alignEnd(),
+                                                        Infolists\Components\Section::make([
+                                                            Infolists\Components\TextEntry::make('description')
+                                                                ->label(''),
+                                                            Infolists\Components\Actions::make([
+                                                                Infolists\Components\Actions\Action::make('file')
+                                                                    ->label(fn ($record) => Str::replaceFirst($this->record->getAttributes()['token'].'/','',$record->file))
+                                                                    ->icon('heroicon-s-document-arrow-down')
+                                                                    ->url(fn ($record) => '/storage/'.$record->file, true),
+                                                                ]),
+                                                            Infolists\Components\Section::make('Answers')
+                                                                ->schema([
+                                                                    
+                                                                ])
+                                                                ->collapsed()
+
+                                                        ])
+                                                    ])
+                                                    ->columns(2)
+                                                ])
                                     ]),
                                 Infolists\Components\Tabs\Tab::make('Topic Works')
                                     ->icon('heroicon-s-clipboard-document-list')
@@ -131,7 +179,11 @@ class ViewClassroom extends ViewRecord
                                                         ->placeholder(Lorem::sentence(10)),
                                                     Forms\Components\FileUpload::make('file')
                                                         ->label('File')                                                        
-                                                        ->required(),
+                                                        ->required()
+                                                        ->maxSize(5120)
+                                                        ->preserveFilenames()
+                                                        ->directory($this->record->getAttributes()['token'])
+                                                        ->acceptedFileTypes(['application/pdf', 'image/*'])
                                                 ])
                                                 ->action(function (array $data) {
                                                     Topic::create([
@@ -150,21 +202,81 @@ class ViewClassroom extends ViewRecord
                                                 ->modalHeading('Add Topic')
                                                 ->modalDescription('Add a new topic to this classroom!')
                                                 ->modalWidth('2xl')
-                                        ]),
-
+                                        ])
+                                        ->fullWidth(),
                                         Infolists\Components\RepeatableEntry::make('topics')
-                                            ->label('')    
+                                            ->label('')
                                             ->schema([
                                                 Infolists\Components\TextEntry::make('title')
-                                                    ->label('Title')
-                                                    ->icon('heroicon-s-document-text'),
-                                                Infolists\Components\TextEntry::make('description')
-                                                    ->label('Description')
-                                                    ->icon('heroicon-s-document-text'),
-                                                Infolists\Components\TextEntry::make('file')
-                                                    ->label('File')
-                                                    ->icon('heroicon-s-document-text'),
-                                            ])->columns(3)
+                                                    ->label('')
+                                                    ->icon('heroicon-s-document-text')
+                                                    ->weight(FontWeight::Bold),
+                                                Infolists\Components\Actions::make([
+                                                    Infolists\Components\Actions\Action::make('delete')
+                                                        ->icon('heroicon-s-trash')
+                                                        ->color('danger')
+                                                        ->action(function ($record) {
+                                                            Topic::where('id', $record->id)->delete();
+                                                            Storage::delete($record->file);
+                                                            return Notifications\Notification::make()
+                                                                ->title('Topic Deleted.')
+                                                                ->success()
+                                                                ->send();
+                                                        })
+                                                        ->requiresConfirmation()
+                                                        ->modalHeading('Delete Topic')
+                                                        ->modalDescription('Are you sure want to delete this topic?')
+                                                        ->modalWidth('lg'),
+                                                    Infolists\Components\Actions\Action::make('edit')
+                                                        ->icon('heroicon-s-pencil-square')
+                                                        ->color('warning')
+                                                        ->fillForm(
+                                                            fn ($record) => [
+                                                                'title' => $record->title,
+                                                                'description' => $record->description,
+                                                                'file' => $record->file,
+                                                            ]
+                                                        )
+                                                        ->form([
+                                                            Forms\Components\TextInput::make('title')
+                                                                ->label('Topic Title')
+                                                                ->required()
+                                                                ->maxLength(255)
+                                                                ->placeholder('Programming Language')
+                                                                ->autocapitalize('words'),
+                                                            Forms\Components\TextInput::make('description')
+                                                                ->label('Topic Description')
+                                                                ->required()
+                                                                ->maxLength(255)
+                                                                ->placeholder(Lorem::sentence(10)),
+                                                            Forms\Components\FileUpload::make('file')
+                                                                ->label('File')                                                        
+                                                                ->required()
+                                                                ->maxSize(5120)
+                                                                ->preserveFilenames()
+                                                                ->directory($this->record->getAttributes()['token'])
+                                                                ->acceptedFileTypes(['application/pdf', 'image/*']),
+                                                        ])
+                                                        ->action(function (array $data,$record) {
+                                                            Topic::where('id', $record->id)->update([
+                                                                'title' => $data['title'],
+                                                                'description' => $data['description'],
+                                                                'file' => $data['file'],
+                                                            ]);
+
+                                                            return Notifications\Notification::make()
+                                                                ->title('Topic Updated.')
+                                                                ->success()
+                                                                ->send();
+                                                        })
+                                                        ->modalIcon('heroicon-s-pencil-square')
+                                                        ->modalHeading('Edit Topic')
+                                                        ->modalDescription('Edit this topic!')
+                                                        ->modalWidth('2xl'),
+                                                    ])
+                                                    ->alignEnd()
+                                            ])
+                                            ->columns(2)
                                     ]),
                                 Infolists\Components\Tabs\Tab::make('Students')
                                     ->icon('heroicon-s-users')
@@ -174,16 +286,19 @@ class ViewClassroom extends ViewRecord
                                             ->schema([
                                                 Infolists\Components\TextEntry::make('name')
                                                     ->label('Name')
-                                                    ->icon('heroicon-s-user'),
+                                                    ->icon('heroicon-s-user')
+                                                    ->weight(FontWeight::Bold),
                                                 Infolists\Components\TextEntry::make('email')
                                                     ->label('Email')
                                                     ->icon('heroicon-s-envelope'),
                                             ])
+                                            ->columns(2)
                                     ])
                             ])
                             ->columnSpan(2)
-                            
-                        
+                            // ->persistTabInQueryString()
+                            ->persistTab()
+                            ->id('classroom-tabs')
                     ]);
         }else{
             return

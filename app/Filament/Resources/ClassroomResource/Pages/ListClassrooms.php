@@ -22,17 +22,7 @@ class ListClassrooms extends ListRecords
                     ->icon('heroicon-s-squares-plus')
                     ->label('Create Classroom')
                     ->color('primary')
-                    ->fillForm(fn (array $data): array => [
-                        'token' => Str::random(7),
-                        'teacher_id' => auth()->guard('web')->user()->id,
-                    ])
                     ->form([
-                        TextInput::make('token')
-                            ->label('Classroom Token')
-                            ->readOnly()
-                            ->required()
-                            ->unique()
-                            ->maxLength(7),
                         TextInput::make('name')
                             ->label('Classroom Name')
                             ->required()
@@ -44,11 +34,22 @@ class ListClassrooms extends ListRecords
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Informatics'),
-                        TextInput::make('teacher_id')
-                            ->label('Teacher Name')
-                            ->readOnly()
-                            ->required()
                     ])
+                    ->action(function (array $data) {
+                        Models\Classroom::create([
+                            'token' => Str::random(7),
+                            'name' => $data['name'],
+                            'subject' => $data['subject'],
+                            'teacher_id' => auth()->guard('web')->user()->id,
+                        ]);
+
+                        Notification::make()
+                            ->title('Classroom created!')
+                            ->success()
+                            ->send();
+
+                        return redirect()->to('/classrooms'.'/'.Models\Classroom::latest('id')->first()->id);
+                    })
                     ->createAnother(false)
                     ->modalIcon('heroicon-s-squares-plus')
                     ->modalHeading('Create Classroom')

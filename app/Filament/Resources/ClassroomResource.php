@@ -7,8 +7,8 @@ use App\Filament\Resources\ClassroomResource\Pages;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ClassroomResource extends Resource
 {
@@ -17,8 +17,6 @@ class ClassroomResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?string $activeNavigationIcon = 'heroicon-s-academic-cap';
-
-    protected static string $view = 'filament.pages.card-view';
 
     public static function getEloquentQuery(): Builder
     {
@@ -47,10 +45,17 @@ class ClassroomResource extends Resource
         if (auth()->guard('web')->user()->role == 1) {
             return $table
                 ->columns([
-                    Tables\Columns\TextColumn::make('name')
-                        ->label('Classrooms')
-                        ->description(fn (Models\Classroom $record): string => $record->subject)
-                        ->color('primary'),
+                    Tables\Columns\Layout\Stack::make([
+                        Tables\Columns\TextColumn::make('name')
+                            ->weight(FontWeight::Bold)
+                            ->description(fn (Models\Classroom $record): string => $record->subject)
+                            ->color('info'),
+                    ])
+                ])
+                ->contentGrid([
+                    'sm' => 1,
+                    'md' => 2,
+                    'xl' => 3,
                 ])
                 ->paginated(false);
         }else{
@@ -94,7 +99,6 @@ class ClassroomResource extends Resource
     {
         return [
             'index' => Pages\ListClassrooms::route('/'),
-            // 'create' => Pages\CreateClassroom::route('/create'),
             'view' => Pages\ViewClassroom::route('/{record}'),
             'edit' => Pages\EditClassroom::route('/{record}/edit'),
         ];
