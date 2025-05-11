@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent;
 
-class Classroomable extends Model
+class Classroomable extends Eloquent\Model
 {
     protected $table = 'classroomables';
 
@@ -14,17 +14,17 @@ class Classroomable extends Model
         'classroomable_type',
     ];
 
-    public function classroom()
+    public function classroom(): Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Classroom::class);
     }
 
-    public function teacher()
+    public function teacher(): Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function student()
+    public function student(): Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }

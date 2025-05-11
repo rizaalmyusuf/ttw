@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent;
 
-class Classroom extends Model
+class Classroom extends Eloquent\Model
 {
-    use HasFactory, Notifiable;
+    use Eloquent\Factories\HasFactory, Notifiable;
     
     protected $fillable = [
         'name',
@@ -26,22 +23,22 @@ class Classroom extends Model
         'student_id',
     ];
 
-    public function teacher()
+    public function teacher(): Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    public function teachers(): MorphToMany
+    public function teachers(): Eloquent\Relations\MorphToMany
     {
         return $this->morphedByMany(User::class, 'classroomable');
     }
 
-    public function students(): MorphToMany
+    public function students(): Eloquent\Relations\MorphToMany
     {
         return $this->morphedByMany(User::class, 'classroomable');
     }
     
-    public function topics()
+    public function topics(): Eloquent\Relations\HasMany
     {
         return $this->hasMany(Topic::class);
     }

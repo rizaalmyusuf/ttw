@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent;
 
-class Topic extends Model
+class Topic extends Eloquent\Model
 {
     protected $fillable = [
         'title',
@@ -17,12 +17,12 @@ class Topic extends Model
         'classroom_id',
     ];
 
-    public function classroom()
+    public function classroom(): Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Classroom::class, 'classroom_id');
     }
 
-    public function answers()
+    public function answers(): Eloquent\Relations\HasMany
     {
         return $this->hasMany(Answer::class);
     }
