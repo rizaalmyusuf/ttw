@@ -57,15 +57,26 @@ class ClassroomResource extends Resource
                     'md' => 2,
                     'xl' => 3,
                 ])
+                ->emptyStateHeading('No classrooms yet.')
+                ->emptyStateDescription('You can create first.')
                 ->paginated(false);
         }else{
             return $table
                 ->columns([
-                    Tables\Columns\TextColumn::make('classroom.name')
-                        ->label('Classrooms')
-                        ->description(fn (Models\Classroomable $record): string => $record->classroom->subject)
-                        ->color('primary'),
+                    Tables\Columns\Layout\Stack::make([
+                        Tables\Columns\TextColumn::make('classroom.name')
+                            ->weight(FontWeight::Bold)
+                            ->description(fn (Models\Classroomable $record): string => $record->classroom->subject)
+                            ->color('info'),
+                    ]),
                 ])
+                ->contentGrid([
+                    'sm' => 1,
+                    'md' => 2,
+                    'xl' => 3,
+                ])
+                ->emptyStateHeading('No classrooms yet.')
+                ->emptyStateDescription('You can join first or invite by teacher.')
                 ->paginated(false);
         }
 

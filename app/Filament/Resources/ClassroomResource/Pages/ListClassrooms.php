@@ -114,11 +114,6 @@ class ListClassrooms extends ListRecords
             ];
         }
 
-        return [
-            // Actions\CreateAction::make()
-            //     ->icon('heroicon-s-squares-plus')
-            //     ->label('Create Classroom')
-            //     ->color('primary')
-        ];
+        return [];
     }
 }
