@@ -6,15 +6,14 @@ namespace App\Models;
 
 use Filament\Panel;
 use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use Eloquent\Factories\HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -72,7 +71,7 @@ class User extends Authenticatable implements FilamentUser
         return false;
     }
 
-    public function classrooms(): MorphToMany
+    public function classrooms(): Eloquent\Relations\MorphToMany
     {
         return $this->morphToMany(Classroom::class, 'classroomable');
     }

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent;
+use Illuminate\Notifications\Notifiable;
 
 class Classroomable extends Eloquent\Model
 {
+    use Eloquent\Factories\HasFactory, Notifiable;
+
     protected $table = 'classroomables';
 
     protected $fillable = [

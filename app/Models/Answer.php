@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent;
+use Illuminate\Notifications\Notifiable;
 
 class Answer extends Eloquent\Model
 {
+    use Notifiable;
+
     protected $fillable = [
         'content',
         'topic_id',
