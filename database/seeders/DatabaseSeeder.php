@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Classroom;
+use App\Models\Classroomable;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -46,5 +47,7 @@ class DatabaseSeeder extends Seeder
                 ]),
             )
             ->create();
+
+        Classroomable::factory(100)->create();
     }
 }

@@ -22,7 +22,7 @@ class ClassroomFactory extends Factory
             'name' => fake()->company(),
             'subject' => fake()->word(),
             'teacher_id' => rand(2,4),
-            'student_id' => rand(5,15),
+            // 'student_id' => rand(5,15),
         ];
     }
 }
