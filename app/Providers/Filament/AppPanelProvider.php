@@ -22,6 +22,7 @@ class AppPanelProvider extends Filament\PanelProvider
             ->path('')
             ->login(Auth\LoginApp::class)
             ->registration(Auth\RegistrationApp::class)
+            ->profile(isSimple: false)
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
@@ -36,12 +37,8 @@ class AppPanelProvider extends Filament\PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([])
-            // ->databaseNotifications()
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                // Filament\Widgets\AccountWidget::class,
-                // Filament\Widgets\FilamentInfoWidget::class,
-            ])
+            ->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

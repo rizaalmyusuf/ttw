@@ -17,9 +17,13 @@ class StatsOverview extends BaseWidget
                     ->icon('heroicon-s-users'),
             ];
         }elseif(auth()->guard()->user()->role === 1){
+            $classrooms = Models\Classroom::where('teacher_id', auth()->guard()->user()->id)->get();
+            $students = Models\Classroomable::whereIn('classroom_id', $classrooms->pluck('id'))->groupBy('classroomable_id')->get();
             return [
-                Stat::make('Your Classrooms',Models\Classroom::where('teacher_id', auth()->guard()->user()->id)->count())
+                Stat::make('Your Classrooms',$classrooms->count())
                     ->icon('heroicon-s-academic-cap'),
+                Stat::make('Your Students', $students->count())
+                    ->icon('heroicon-s-users'),
             ];
         }else{
             return [
