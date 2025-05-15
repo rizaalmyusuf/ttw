@@ -2,6 +2,7 @@
 namespace App\Filament\Pages;
 
 use Filament\Facades\Filament;
+use Filament\Widgets;
 
 class Dashboard extends \Filament\Pages\Dashboard {
     protected static string $routePath = '/';
@@ -13,6 +14,8 @@ class Dashboard extends \Filament\Pages\Dashboard {
     {
         return [
             \App\Filament\Widgets\StatsOverview::class,
+            Widgets\AccountWidget::class,
+            Widgets\FilamentInfoWidget::class,
         ];
     }
 }
