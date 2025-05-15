@@ -32,7 +32,7 @@ class LoginApp extends Login
 
         $user = Filament::auth()->user();
         
-        if (($user instanceof FilamentUser) && (! $user->canAccessPanel(Filament::getCurrentPanel()))) {            
+        if (($user instanceof FilamentUser) && (! $user->canAccessPanel(Filament::getCurrentPanel()))) {
             Filament::auth()->logout();
             
             $this->throwFailureValidationException();
