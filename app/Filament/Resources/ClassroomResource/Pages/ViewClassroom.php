@@ -3,18 +3,17 @@
 namespace App\Filament\Resources\ClassroomResource\Pages;
 
 use App\Models;
+use App\Filament\Resources\ClassroomResource;
+use Faker\Provider\Lorem;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Actions;
 use Filament\Infolists;
-use Illuminate\Support;
-use Faker\Provider\Lorem;
 use Filament\Notifications;
 use Filament\Support\Enums;
 use Filament\Resources\Pages;
-use Filament\Notifications\Notification;
+use Illuminate\Support;
 use Illuminate\Contracts\Support\Htmlable;
-use App\Filament\Resources\ClassroomResource;
 
 class ViewClassroom extends Pages\ViewRecord
 {
@@ -76,7 +75,8 @@ class ViewClassroom extends Pages\ViewRecord
                             $this->record->delete();
 
                             Notifications\Notification::make()
-                                ->title('Classroom Deleted')
+                                ->title('Success!')
+                                ->body('Classroom has been deleted!')
                                 ->success()
                                 ->send();
                             
@@ -206,7 +206,8 @@ class ViewClassroom extends Pages\ViewRecord
                                                     ]);
 
                                                     return Notifications\Notification::make()
-                                                        ->title('Topic Created')
+                                                        ->title('Congrats!')
+                                                        ->body('Topic has been created!')
                                                         ->success()
                                                         ->send();
                                                 })
@@ -233,7 +234,8 @@ class ViewClassroom extends Pages\ViewRecord
                                                             Models\Topic::where('id', $record->id)->delete();
                                                             Support\Facades\Storage::delete($record->file);
                                                             return Notifications\Notification::make()
-                                                                ->title('Topic Deleted.')
+                                                                ->title('Success!')
+                                                                ->body('Topic has been deleted!')
                                                                 ->success()
                                                                 ->send();
                                                         })
@@ -279,7 +281,8 @@ class ViewClassroom extends Pages\ViewRecord
                                                             ]);
 
                                                             return Notifications\Notification::make()
-                                                                ->title('Topic Updated.')
+                                                                ->title('Congrats!')
+                                                                ->body('Topic has been updated!')
                                                                 ->success()
                                                                 ->send();
                                                         })
@@ -314,15 +317,17 @@ class ViewClassroom extends Pages\ViewRecord
                                                     }elseif (Models\User::where('email', $data['search'])->first()){
                                                         $student = Models\User::where('email', $data['search'])->first();
                                                     }else{
-                                                        return Notification::make()
-                                                            ->title('People not found.')
+                                                        return Notifications\Notification::make()
+                                                            ->title('Failed!')
+                                                            ->body('Ouh no, people not found!')
                                                             ->danger()
                                                             ->send();
                                                     };
 
                                                     if(Models\Classroomable::where(['classroom_id' => $record->id,'classroomable_id' => $student->id])->first()){
-                                                        return Notification::make()
-                                                            ->title('People already joined.')
+                                                        return Notifications\Notification::make()
+                                                            ->title('Failed!')
+                                                            ->body('Don\'t worry, '.$student->name.' is already a member of this classroom!')
                                                             ->warning()
                                                             ->send();
                                                     }else{
@@ -332,8 +337,9 @@ class ViewClassroom extends Pages\ViewRecord
                                                             'classroomable_type' => 'App\Models\User'
                                                         ]);
 
-                                                        return Notification::make()
-                                                            ->title('People invited.')
+                                                        return Notifications\Notification::make()
+                                                            ->title('Congrats!')
+                                                            ->body('Hoorayy, '.$student->name.' is now a member of this classroom!')
                                                             ->success()
                                                             ->send();
                                                     }
@@ -420,8 +426,9 @@ class ViewClassroom extends Pages\ViewRecord
                                                                             'topic_id' => $record->id,
                                                                             'student_id' => auth()->guard()->user()->id,
                                                                     ])){
-                                                                        Notification::make()
-                                                                            ->title('Answer has been submitted!')
+                                                                        Notifications\Notification::make()
+                                                                            ->title('Congrats!')
+                                                                            ->body('Your answer has been submitted!')
                                                                             ->success()
                                                                             ->send();
                                                                         return;

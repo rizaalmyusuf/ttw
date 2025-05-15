@@ -4,11 +4,11 @@ namespace App\Filament\Resources\ClassroomResource\Pages;
 
 use App\Models;
 use App\Filament\Resources\ClassroomResource;
-use Illuminate\Support\Str;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Str;
 
 class ListClassrooms extends ListRecords
 {
@@ -44,7 +44,8 @@ class ListClassrooms extends ListRecords
                         ]);
 
                         Notification::make()
-                            ->title('Classroom created!')
+                            ->title('Congrats!')
+                            ->body('Classroom created successfully!')                            
                             ->success()
                             ->send();
 
@@ -76,7 +77,8 @@ class ListClassrooms extends ListRecords
 
                         if ($classroom === null) {
                             Notification::make()
-                                ->title('Classroom not found!')
+                                ->title('Failed!')
+                                ->body('Ouh no, classroom not found!')
                                 ->danger()
                                 ->send();
                             return;
@@ -87,8 +89,9 @@ class ListClassrooms extends ListRecords
                             ->where('classroomable_type', 'App\Models\User')
                             ->exists()) {
                             Notification::make()
-                                ->title('You are already a member of this classroom!')
-                                ->danger()
+                                ->title('Failed!')
+                                ->body('Don\'t worry, you are already a member of this classroom!')
+                                ->warning()
                                 ->send();
                             return;
                         }else{
@@ -99,7 +102,8 @@ class ListClassrooms extends ListRecords
                             ]);
 
                             Notification::make()
-                                ->title('Classroom joined successfully!')
+                                ->title('Congrats!')
+                                ->body('Hoorayy, you are now a member of this classroom!')
                                 ->success()
                                 ->send();
                             return;
