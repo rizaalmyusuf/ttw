@@ -117,7 +117,6 @@ class ListClassrooms extends ListRecords
                     ->modalWidth('lg')
             ];
         }
-
         return [];
     }
 }

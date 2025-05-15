@@ -6,7 +6,6 @@ use App\Models;
 use App\Filament\Resources\ClassroomResource;
 use Faker\Provider\Lorem;
 use Filament\Forms;
-use Filament\Tables;
 use Filament\Actions;
 use Filament\Infolists;
 use Filament\Notifications;
@@ -32,7 +31,6 @@ class ViewClassroom extends Pages\ViewRecord
             if($this->record->getAttributes()['name']) {
                 return $this->record->getAttributes()['name'];
             }
-            // return $this->record->getAttributes()['name'];
         }
 
         return __('filament-panels::resources/pages/view-record.title', [
@@ -108,7 +106,6 @@ class ViewClassroom extends Pages\ViewRecord
                                         Infolists\Components\Section::make([
                                             Infolists\Components\TextEntry::make('token')
                                                 ->label('Token')
-                                                // ->badge()
                                                 ->icon('heroicon-s-key')
                                                 ->iconColor('warning')
                                                 ->color('warning')
@@ -363,7 +360,6 @@ class ViewClassroom extends Pages\ViewRecord
                                     ])
                             ])
                             ->columnSpan(2)
-                            // ->persistTabInQueryString()
                             ->persistTab()
                             ->id('classroom-tabs')
                     ]);

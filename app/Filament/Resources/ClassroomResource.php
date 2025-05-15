@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Models;
 use App\Filament\Resources\ClassroomResource\Pages;
-use Filament\Forms;
 use Filament\Tables;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
@@ -23,21 +22,12 @@ class ClassroomResource extends Resource
         if (auth()->guard('web')->user()->role == 1) {
             return parent::getEloquentQuery()->where('teacher_id', auth()->guard('web')->user()->id)->groupBy('token');
         } else {
-            // return parent::getEloquentQuery()->where('student_id', auth()->guard('web')->user()->id);
             return Models\Classroomable::query()
                 ->where('classroomable_id', auth()->guard('web')->user()->id)
                 ->with(['classroom'])
                 ->groupBy('classroom_id')
                 ->orderBy('created_at', 'desc');
         }
-    }
-
-    public static function form(Forms\Form $form): Forms\Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
     }
 
     public static function table(Tables\Table $table): Tables\Table
@@ -81,29 +71,15 @@ class ClassroomResource extends Resource
         }
 
         return $table
-            ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                // Tables\Actions\ViewAction::make(),
-                // Tables\Actions\EditAction::make(),
-            ])
+            ->columns([])
+            ->filters([])
+            ->actions([])
             ->paginated(false);
-            // ->bulkActions([
-            //     Tables\Actions\BulkActionGroup::make([
-            //         Tables\Actions\DeleteBulkAction::make(),
-            //     ]),
-            // ]);
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -111,7 +87,6 @@ class ClassroomResource extends Resource
         return [
             'index' => Pages\ListClassrooms::route('/'),
             'view' => Pages\ViewClassroom::route('/{record}'),
-            'edit' => Pages\EditClassroom::route('/{record}/edit'),
         ];
     }
 }
