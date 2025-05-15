@@ -92,12 +92,19 @@ class UserResource extends Resource
                     ]),
                 EditAction::make()
                     ->form([
-                        TextInput::make('username')->placeholder('johndoe')->required()->maxLength(255),
+                        // TextInput::make('username')->placeholder('johndoe')->required()->maxLength(255)->unique(User::class,'username'),
                         TextInput::make('name')->label('Full Name')->placeholder('John Doe')->required()->maxLength(255),
-                        TextInput::make('email')->email()->placeholder('johndoe@mail.com')->required()->maxLength(255),
-                        // TextInput::make('password')->password()->placeholder('Type your password here')->required()->maxLength(255),
+                        // TextInput::make('email')->email()->placeholder('johndoe@mail.com')->required()->maxLength(255)->unique(),
+                        TextInput::make('password')->password()->placeholder('Type the password here to overwrite')->maxLength(255),
                         Select::make('role')->options(['1' => 'Teacher','2' => 'Student'])->required(),
-                    ]),
+                    ])
+                    ->action(function (array $data, $record){
+                        if(isset($data['password'])) {
+                            $data['password'] = bcrypt($data['password']);
+                        }
+                        $record->update($data);
+                        $record->save();
+                    }),
                 DeleteAction::make(),
             ])
             ->bulkActions([
