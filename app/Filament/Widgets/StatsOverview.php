@@ -27,7 +27,7 @@ class StatsOverview extends BaseWidget
             ];
         }else{
             return [
-                Stat::make('Your Joined Classrooms',Models\Classroomable::where('classroomable_id', auth()->guard()->user()->id)->count())
+                Stat::make('Your Joined Classrooms',Models\Classroomable::where('classroomable_id', auth()->guard()->user()->id)->groupBy('classroom_id')->get()->count())
                     ->icon('heroicon-s-academic-cap')
             ];
         }

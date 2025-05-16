@@ -35,7 +35,7 @@ class Classroom extends Eloquent\Model
 
     public function students(): Eloquent\Relations\MorphToMany
     {
-        return $this->morphedByMany(User::class, 'classroomable');
+        return $this->morphedByMany(User::class, 'classroomable')->groupBy('classroomable_id');
     }
     
     public function topics(): Eloquent\Relations\HasMany

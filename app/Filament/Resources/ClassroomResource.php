@@ -26,7 +26,7 @@ class ClassroomResource extends Resource
                 ->where('classroomable_id', auth()->guard('web')->user()->id)
                 ->with(['classroom'])
                 ->groupBy('classroom_id')
-                ->orderBy('created_at', 'desc');
+                ->orderBy('created_at', 'asc');
         }
     }
 
