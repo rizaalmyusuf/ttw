@@ -12,8 +12,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            \Filament\Http\Responses\Auth\Contracts\LogoutResponse::class,
-            \App\Http\Responses\LogoutResponse::class
+            \Filament\Http\Controllers\Auth\LogoutController::class,
+            \App\Http\Controllers\Auth\LogoutController::class
         );
     }
 
