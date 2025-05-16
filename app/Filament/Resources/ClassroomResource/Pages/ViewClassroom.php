@@ -123,25 +123,25 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ),
                                             ]),
                                         Infolists\Components\RepeatableEntry::make('topics')
-                                            ->label('')
+                                            ->hiddenLabel()
                                             ->contained(false)
                                             ->schema([
                                                 Infolists\Components\Section::make([
                                                     Infolists\Components\TextEntry::make('title')
-                                                        ->label('')
+                                                        ->hiddenLabel()
                                                         ->icon('heroicon-s-document-text')
                                                         ->iconColor('primary')
                                                         ->weight(Enums\FontWeight::Bold)
                                                         ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
                                                     Infolists\Components\TextEntry::make('created_at')
-                                                        ->label('')
+                                                        ->hiddenLabel()
                                                         ->icon('heroicon-s-clock')
                                                         ->alignEnd()
                                                         ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
                                                         ->since(),
                                                     Infolists\Components\Section::make([
                                                         Infolists\Components\TextEntry::make('description')
-                                                            ->label(''),
+                                                            ->hiddenLabel(),
                                                         Infolists\Components\Actions::make([
                                                             Infolists\Components\Actions\Action::make('file')
                                                                 ->label(fn ($record) => Support\Str::replaceFirst($this->record->getAttributes()['token'].'/','',$record->file))
@@ -151,14 +151,14 @@ class ViewClassroom extends Pages\ViewRecord
                                                         Infolists\Components\Section::make('Answers')
                                                             ->schema([
                                                                 Infolists\Components\RepeatableEntry::make('answers')
-                                                                ->label('')
+                                                                ->hiddenLabel()
                                                                 ->schema([
                                                                     Infolists\Components\TextEntry::make('student.name')
-                                                                        ->label('')
+                                                                        ->hiddenLabel()
                                                                         ->icon('heroicon-s-user')
                                                                         ->iconColor('info'),
                                                                     Infolists\Components\TextEntry::make('content')
-                                                                        ->label('')                                                                       
+                                                                        ->hiddenLabel()                                                                       
                                                                 ])
                                                             ])
                                                             ->collapsed()
@@ -215,10 +215,10 @@ class ViewClassroom extends Pages\ViewRecord
                                         ])
                                         ->fullWidth(),
                                         Infolists\Components\RepeatableEntry::make('topics')
-                                            ->label('')
+                                            ->hiddenLabel()
                                             ->schema([
                                                 Infolists\Components\TextEntry::make('title')
-                                                    ->label('')
+                                                    ->hiddenLabel()
                                                     ->icon('heroicon-s-document-text')
                                                     ->iconColor('info')
                                                     ->weight(Enums\FontWeight::Bold)
@@ -344,15 +344,15 @@ class ViewClassroom extends Pages\ViewRecord
                                         ])
                                         ->fullWidth(),
                                         Infolists\Components\RepeatableEntry::make('students')
-                                            ->label('')    
+                                            ->hiddenLabel()    
                                             ->schema([
                                                 Infolists\Components\TextEntry::make('name')
-                                                    ->label('')
+                                                    ->hiddenLabel()
                                                     ->icon('heroicon-s-user')
                                                     ->iconColor('info')
                                                     ->weight(Enums\FontWeight::Bold),
                                                 Infolists\Components\TextEntry::make('email')
-                                                    ->label('')
+                                                    ->hiddenLabel()
                                                     ->icon('heroicon-s-envelope')
                                                     ->iconColor('info'),
                                             ])
@@ -374,25 +374,25 @@ class ViewClassroom extends Pages\ViewRecord
                                     ->icon('heroicon-s-signal')
                                     ->schema([
                                         Infolists\Components\RepeatableEntry::make('classroom.topics')
-                                            ->label('')
+                                            ->hiddenLabel()
                                             ->contained(false)
                                             ->schema([
                                                 Infolists\Components\Section::make([
                                                     Infolists\Components\TextEntry::make('title')
-                                                        ->label('')
+                                                        ->hiddenLabel()
                                                         ->icon('heroicon-s-document-text')
                                                         ->iconColor('primary')
                                                         ->weight(Enums\FontWeight::Bold)
                                                         ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
                                                     Infolists\Components\TextEntry::make('created_at')
-                                                        ->label('')
+                                                        ->hiddenLabel()
                                                         ->icon('heroicon-s-clock')
                                                         ->since()
                                                         ->alignEnd()
                                                         ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall),
                                                     Infolists\Components\Section::make([
                                                         Infolists\Components\TextEntry::make('description')
-                                                            ->label(''),
+                                                            ->hiddenLabel(),
                                                         Infolists\Components\Actions::make([
                                                             Infolists\Components\Actions\Action::make('file')
                                                                 ->label(fn ($record) => Support\Str::replaceFirst($this->record->classroom->getAttributes()['token'].'/','',$record->file))
@@ -403,12 +403,12 @@ class ViewClassroom extends Pages\ViewRecord
                                                     Infolists\Components\Section::make('Answers')
                                                         ->headerActions([                                                            
                                                             Infolists\Components\Actions\Action::make('answer-topic')
-                                                                ->label('')
+                                                                ->hiddenLabel()
                                                                 ->icon('heroicon-s-pencil')
                                                                 ->color('warning')
                                                                 ->form([
                                                                     Forms\Components\TextInput::make('content')
-                                                                        ->label('')
+                                                                        ->hiddenLabel()
                                                                         ->placeholder('Type your answer here!')
                                                                         ->required()
                                                                 ])
@@ -433,13 +433,13 @@ class ViewClassroom extends Pages\ViewRecord
                                                         ])
                                                         ->schema([
                                                             Infolists\Components\RepeatableEntry::make('answers')
-                                                                ->label('')
+                                                                ->hiddenLabel()
                                                                 ->schema([
                                                                     Infolists\Components\TextEntry::make('student.name')
-                                                                        ->label('')
+                                                                        ->hiddenLabel()
                                                                         ->icon('heroicon-s-user'),
                                                                     Infolists\Components\TextEntry::make('content')
-                                                                        ->label('')                                                                       
+                                                                        ->hiddenLabel()                                                                       
                                                                 ])
                                                         ])
                                                         ->collapsed()
@@ -451,16 +451,16 @@ class ViewClassroom extends Pages\ViewRecord
                                     ->icon('heroicon-s-clipboard-document-list')
                                     ->schema([
                                         Infolists\Components\RepeatableEntry::make('classroom.topics')
-                                            ->label('')
+                                            ->hiddenLabel()
                                             ->schema([
                                                 Infolists\Components\TextEntry::make('title')
-                                                    ->label('')
+                                                    ->hiddenLabel()
                                                     ->icon('heroicon-s-document-text')
                                                     ->iconColor('info')
                                                     ->weight(Enums\FontWeight::Bold)
                                                     ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
                                                 Infolists\Components\TextEntry::make('created_at')
-                                                    ->label('')
+                                                    ->hiddenLabel()
                                                     ->icon('heroicon-s-clock')     
                                                     ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
                                                     ->alignEnd()
@@ -472,10 +472,10 @@ class ViewClassroom extends Pages\ViewRecord
                                     ->icon('heroicon-s-users')
                                     ->schema([
                                         Infolists\Components\RepeatableEntry::make('classroom.students')
-                                            ->label('')
+                                            ->hiddenLabel()
                                             ->schema([
                                                 Infolists\Components\TextEntry::make('name')
-                                                    ->label('')
+                                                    ->hiddenLabel()
                                                     ->icon('heroicon-s-user')
                                                     ->iconColor('info')
                                                     ->weight(Enums\FontWeight::Bold)
