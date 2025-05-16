@@ -82,7 +82,7 @@ class ViewClassroom extends Pages\ViewRecord
                         })
                 ])
                 ->icon('heroicon-s-cog-8-tooth')
-                ->size(Enums\ActionSize::Large)
+                ->size(Enums\ActionSize::ExtraLarge)
                 ->color('info')
                 ->iconButton()
             ];
@@ -148,21 +148,36 @@ class ViewClassroom extends Pages\ViewRecord
                                                                 ->icon('heroicon-s-document-arrow-down')
                                                                 ->url(fn ($record) => '/storage/'.$record->file, true),
                                                             ]),
-                                                        Infolists\Components\Section::make('Answers')
+                                                        ]),
+                                                    Infolists\Components\Section::make('Answers')
+                                                        ->schema([
+                                                            Infolists\Components\RepeatableEntry::make('answers')
+                                                            ->hiddenLabel()
                                                             ->schema([
-                                                                Infolists\Components\RepeatableEntry::make('answers')
-                                                                ->hiddenLabel()
-                                                                ->schema([
-                                                                    Infolists\Components\TextEntry::make('student.name')
-                                                                        ->hiddenLabel()
-                                                                        ->icon('heroicon-s-user')
-                                                                        ->iconColor('info'),
-                                                                    Infolists\Components\TextEntry::make('content')
-                                                                        ->hiddenLabel()                                                                       
-                                                                ])
+                                                                Infolists\Components\TextEntry::make('student.name')
+                                                                    ->hiddenLabel()
+                                                                    ->icon('heroicon-s-user')
+                                                                    ->iconColor('info')
+                                                                    ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall),
+                                                                Infolists\Components\TextEntry::make('created_at')
+                                                                    ->hiddenLabel()
+                                                                    ->icon('heroicon-s-clock')
+                                                                    ->alignEnd()
+                                                                    ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
+                                                                    ->since(),
+                                                                Infolists\Components\TextEntry::make('content')
+                                                                    ->hiddenLabel()
+                                                                    ->icon('heroicon-s-chat-bubble-left-ellipsis')
+                                                                    ->iconColor('info')
+                                                                    ->columnSpan(2)
                                                             ])
-                                                            ->collapsed()
-                                                    ])
+                                                            ->columns([
+                                                                'xl' => 2,
+                                                                'sm' => 1,
+                                                            ])
+                                                        ])
+                                                        ->collapsible()
+                                                        ->collapsed()
                                                 ])
                                                 ->columns(2)
                                             ])
