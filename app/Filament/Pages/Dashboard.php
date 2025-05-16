@@ -13,9 +13,9 @@ class Dashboard extends \Filament\Pages\Dashboard {
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\StatsOverview::class,
             Widgets\AccountWidget::class,
             Widgets\FilamentInfoWidget::class,
+            \App\Filament\Widgets\StatsOverview::class,
         ];
     }
 }
