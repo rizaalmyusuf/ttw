@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('topics', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('description');
+            $table->text('description');
             $table->binary('file');
             $table->foreignId('classroom_id')->constrained('classrooms');
             $table->timestamps();
