@@ -3,6 +3,9 @@ import laravel, { refreshPaths } from "laravel-vite-plugin";
 import tailwindcss from "tailwindcss";
 
 export default defineConfig({
+    server: {
+        host: true,
+    },
     plugins: [
         laravel({
             input: [
