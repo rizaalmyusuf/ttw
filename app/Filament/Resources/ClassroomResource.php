@@ -19,7 +19,7 @@ class ClassroomResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        if (auth()->guard('web')->user()->role == 1) {
+        if ((new static)->role() === 1) {
             return parent::getEloquentQuery()->where('teacher_id', auth()->guard('web')->user()->id)->groupBy('token');
         } else {
             return Models\Classroomable::query()
@@ -31,14 +31,15 @@ class ClassroomResource extends Resource
     }
 
     public static function table(Tables\Table $table): Tables\Table
-    {   
-        if (auth()->guard('web')->user()->role == 1) {
-            return $table
+    {
+        return $table
                 ->columns([
                     Tables\Columns\Layout\Stack::make([
-                        Tables\Columns\TextColumn::make('name')
+                        Tables\Columns\TextColumn::make(((new static)->role() === 2 ? 'classroom.' : '').'name')
                             ->weight(FontWeight::Bold)
-                            ->description(fn (Models\Classroom $record): string => $record->subject)
+                            ->description(function (Models\Classroom $recordForTeacher, Models\Classroomable $recordForStudent){
+                                return (new static)->role() === 1 ? $recordForTeacher->subject : $recordForStudent->classroom->subject;
+                            })
                             ->color('info'),
                     ])
                 ])
@@ -48,33 +49,8 @@ class ClassroomResource extends Resource
                     'xl' => 3,
                 ])
                 ->emptyStateHeading('No classrooms yet.')
-                ->emptyStateDescription('You can create first.')
+                ->emptyStateDescription((new static)->role() === 1 ? 'You can create first.' : 'You can join first or invite by teacher.')
                 ->paginated(false);
-        }else{
-            return $table
-                ->columns([
-                    Tables\Columns\Layout\Stack::make([
-                        Tables\Columns\TextColumn::make('classroom.name')
-                            ->weight(FontWeight::Bold)
-                            ->description(fn (Models\Classroomable $record): string => $record->classroom->subject)
-                            ->color('info'),
-                    ]),
-                ])
-                ->contentGrid([
-                    'sm' => 1,
-                    'md' => 2,
-                    'xl' => 3,
-                ])
-                ->emptyStateHeading('No classrooms yet.')
-                ->emptyStateDescription('You can join first or invite by teacher.')
-                ->paginated(false);
-        }
-
-        return $table
-            ->columns([])
-            ->filters([])
-            ->actions([])
-            ->paginated(false);
     }
 
     public static function getRelations(): array
@@ -88,5 +64,9 @@ class ClassroomResource extends Resource
             'index' => Pages\ListClassrooms::route('/'),
             'view' => Pages\ViewClassroom::route('/{record}'),
         ];
+    }
+
+    protected function role(): int {
+        return auth()->guard()->user()->role;
     }
 }
