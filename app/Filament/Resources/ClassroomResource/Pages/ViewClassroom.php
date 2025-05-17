@@ -61,7 +61,7 @@ class ViewClassroom extends Pages\ViewRecord
                     ->modalIcon('heroicon-s-pencil-square')
                     ->modalHeading('Edit Classroom'),
                 Actions\Action::make($this->role() === 1 ? 'delete' : 'leave')
-                    ->icon($this->role() === 1 ? 'heroicon-s-trash' : 'heroicon-s-arrow-left-end-on-rectangle')
+                    ->icon($this->role() === 1 ? 'heroicon-s-trash' : 'heroicon-s-arrow-left-start-on-rectangle')
                     ->label($this->role() === 1 ? 'Delete' : 'Leave')
                     ->color('danger')
                     ->requiresConfirmation()
@@ -151,6 +151,8 @@ class ViewClassroom extends Pages\ViewRecord
                                                     ]),
                                                 ]),
                                             Infolists\Components\Section::make('Answers')
+                                                ->icon('heroicon-s-chat-bubble-left-right')
+                                                ->iconColor('info')
                                                 ->headerActions([
                                                     Infolists\Components\Actions\Action::make('answer-topic')
                                                         ->hiddenLabel()
