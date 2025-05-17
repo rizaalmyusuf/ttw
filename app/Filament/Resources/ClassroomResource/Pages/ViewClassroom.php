@@ -231,11 +231,11 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->maxLength(255)
                                                 ->placeholder('Programming Language')
                                                 ->autocapitalize('words'),
-                                            Forms\Components\TextInput::make('description')
+                                            Forms\Components\Textarea::make('description')
                                                 ->label('Topic Description')
                                                 ->required()
                                                 ->maxLength(255)
-                                                ->placeholder(Lorem::sentence(10)),
+                                                ->placeholder(Lorem::sentence(50)),
                                             Forms\Components\FileUpload::make('file')
                                                 ->label('File')                                                        
                                                 ->required()
