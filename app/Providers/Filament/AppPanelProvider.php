@@ -23,14 +23,18 @@ class AppPanelProvider extends Filament\PanelProvider
             ->login(Auth\LoginApp::class)
             ->registration(Auth\RegistrationApp::class)
             ->profile(isSimple: false)
+            ->favicon(asset('images/favicon.png'))
             ->colors([
-                'danger' => Color::Rose,
-                'gray' => Color::Gray,
-                'info' => Color::Blue,
                 'primary' => Color::Indigo,
                 'success' => Color::Emerald,
-                'warning' => Color::Orange,
+                'info' => Color::Cyan,
+                'gray' => Color::Gray,
+                'warning' => Color::Amber,
+                'danger' => Color::Rose,
             ])
+            ->font('Montserrat')
+            ->brandName('TTW')
+            ->brandLogo(asset('images/logo.svg'))
             ->sidebarCollapsibleOnDesktop()
             ->spa()
             ->viteTheme('resources/css/filament/user/theme.css')
