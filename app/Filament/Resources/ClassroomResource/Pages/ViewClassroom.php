@@ -154,8 +154,10 @@ class ViewClassroom extends Pages\ViewRecord
                                                     ->hiddenLabel()
                                                     ->url(fn ($record) => '/storage/'.$record->file, true)
                                                     ->size('100%')
+                                                    ->alignCenter()
                                                     ->visible(fn ($record) => Support\Str::contains($record->file, ['.png', '.jpg', '.jpeg', '.gif'])),
                                                 Infolists\Components\ViewEntry::make('file')
+                                                    ->alignCenter()
                                                     ->view('filament.infolists.entries.video-player')
                                                     ->hiddenLabel()
                                                     ->visible(fn ($record) => Support\Str::contains($record->file, ['.mp4']))
@@ -251,7 +253,7 @@ class ViewClassroom extends Pages\ViewRecord
                                             Forms\Components\FileUpload::make('file')
                                                 ->label('File')                                                        
                                                 ->required()
-                                                ->maxSize(7168)
+                                                ->maxSize(8192)
                                                 ->preserveFilenames()
                                                 ->directory($this->role() === 1 ? $this->record->token : $this->record->classroom->token)
                                                 ->acceptedFileTypes([
