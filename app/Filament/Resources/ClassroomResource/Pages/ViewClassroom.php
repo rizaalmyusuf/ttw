@@ -147,9 +147,19 @@ class ViewClassroom extends Pages\ViewRecord
                                                     Infolists\Components\Actions\Action::make('file')
                                                         ->label(fn ($record) => Support\Str::replaceFirst(($this->role() === 1 ? $this->record->token : $this->record->classroom->token).'/','',$record->file))
                                                         ->icon('heroicon-s-document-arrow-down')
-                                                        ->url(fn ($record) => '/storage/'.$record->file, true),
-                                                    ]),
+                                                        ->url(fn ($record) => '/storage/'.$record->file, true)
+                                                        ->visible(fn ($record) => Support\Str::contains($record->file, ['.pdf', '.zip'])),
                                                 ]),
+                                                Infolists\Components\ImageEntry::make('file')
+                                                    ->hiddenLabel()
+                                                    ->url(fn ($record) => '/storage/'.$record->file, true)
+                                                    ->size('100%')
+                                                    ->visible(fn ($record) => Support\Str::contains($record->file, ['.png', '.jpg', '.jpeg', '.gif'])),
+                                                Infolists\Components\ViewEntry::make('file')
+                                                    ->view('filament.infolists.entries.video-player')
+                                                    ->hiddenLabel()
+                                                    ->visible(fn ($record) => Support\Str::contains($record->file, ['.mp4']))
+                                            ]),
                                             Infolists\Components\Section::make('Answers')
                                                 ->icon('heroicon-s-chat-bubble-left-right')
                                                 ->iconColor('info')
@@ -241,10 +251,15 @@ class ViewClassroom extends Pages\ViewRecord
                                             Forms\Components\FileUpload::make('file')
                                                 ->label('File')                                                        
                                                 ->required()
-                                                ->maxSize(5120)
+                                                ->maxSize(7168)
                                                 ->preserveFilenames()
                                                 ->directory($this->role() === 1 ? $this->record->token : $this->record->classroom->token)
-                                                ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                                ->acceptedFileTypes([
+                                                    'application/pdf',
+                                                    'application/zip', 'application/x-compressed', 'application/x-zip-compressed', 'multipart/x-zip',
+                                                    'image/png', 'image/jpg', 'image/jpeg', 'image/gif',
+                                                    'video/mp4'
+                                                ])
                                         ])
                                         ->action(function (array $data) {
                                             Models\Topic::create([
