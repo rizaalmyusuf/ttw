@@ -17,37 +17,37 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->create([
             'username' => 'admin',
-            'password' => bcrypt('Admin'),
+            'password' => bcrypt('@RizalMYusuf010600'),
             'name' => 'Administrator',
             'email' => 'admin@ttw.id',
             'role' => 0,
         ]);
 
-        Classroom::factory(15)
-            ->recycle(
-                User::factory()->create([
-                    'username' => 'gurutik',
-                    'password' => bcrypt('GuruTIK'),
-                    'name' => 'Guru TIK',
-                    'email' => 'gurutik@ttw.id',
-                    'role' => 1,
-                ]),
-                User::factory(2)->create([
-                    'role' => 1,
-                ]),
-                User::factory()->create([
-                    'username' => 'muridtik',
-                    'password' => bcrypt('MuridTIK'),
-                    'name' => 'Murid TIK',
-                    'email' => 'muridtik@ttw.id',
-                    'role' => 2,
-                ]),
-                User::factory(10)->create([
-                    'role' => 2,
-                ]),
-            )
-            ->create();
+        // Classroom::factory(15)
+        //     ->recycle(
+        //         User::factory()->create([
+        //             'username' => 'gurutik',
+        //             'password' => bcrypt('GuruTIK'),
+        //             'name' => 'Guru TIK',
+        //             'email' => 'gurutik@ttw.id',
+        //             'role' => 1,
+        //         ]),
+        //         User::factory(2)->create([
+        //             'role' => 1,
+        //         ]),
+        //         User::factory()->create([
+        //             'username' => 'muridtik',
+        //             'password' => bcrypt('MuridTIK'),
+        //             'name' => 'Murid TIK',
+        //             'email' => 'muridtik@ttw.id',
+        //             'role' => 2,
+        //         ]),
+        //         User::factory(10)->create([
+        //             'role' => 2,
+        //         ]),
+        //     )
+        //     ->create();
 
-        Classroomable::factory(100)->create();
+        // Classroomable::factory(100)->create();
     }
 }
