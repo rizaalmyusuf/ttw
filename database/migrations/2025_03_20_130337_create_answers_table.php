@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
             $table->text('content');
+            $table->text('reply')->nullable();
+            $table->foreignId('reply_from')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('topic_id')->constrained('topics')->cascadeOnDelete();
             $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();

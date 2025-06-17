@@ -29,4 +29,9 @@ class Answer extends Eloquent\Model
     {
         return $this->belongsTo(User::class, 'student_id');
     }
+
+    public function replyFrom(): Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reply_from');
+    }
 }
