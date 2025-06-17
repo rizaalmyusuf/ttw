@@ -315,7 +315,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                                 ->modalHeading($this->role() === 1 ? 'Delete Reply' : 'Delete Answer')
                                                                 ->modalDescription('Are you sure want to delete this '. ($this->role() === 1 ? 'reply' : 'answer').'?')
                                                                 ->modalWidth('lg')
-                                                                ->visible(fn ($record) => $this->role() === 2 || $record->reply !== null),
+                                                                ->visible(fn ($record) => $record->student_id === auth()->guard()->user()->id || $record->reply !== null),
                                                         ]),
                                                     Infolists\Components\TextEntry::make('content')
                                                         ->hiddenLabel()
