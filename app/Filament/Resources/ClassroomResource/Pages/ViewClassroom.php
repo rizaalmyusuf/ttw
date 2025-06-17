@@ -7,7 +7,9 @@ use App\Filament\Resources\ClassroomResource;
 use Faker\Provider\Lorem;
 use Filament\Forms;
 use Filament\Actions;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Notifications;
 use Filament\Support\Enums;
 use Filament\Resources\Pages;
@@ -106,6 +108,9 @@ class ViewClassroom extends Pages\ViewRecord
                                 Infolists\Components\Section::make([
                                     Infolists\Components\TextEntry::make('token')
                                         ->label('Token')
+                                        ->copyable()
+                                        ->copyMessage('Token copied!')
+                                        ->copyMessageDuration(2000)
                                         ->icon('heroicon-s-key')
                                         ->iconColor('warning')
                                         ->color('warning')
@@ -170,6 +175,43 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->view('filament.infolists.entries.disqus')
                                                 ->hiddenLabel()
                                                 ->columnSpan(2),
+                                            Infolists\Components\Actions::make([
+                                                Infolists\Components\Actions\Action::make('answer-topic')
+                                                    ->hiddenLabel()
+                                                    ->icon('heroicon-s-pencil')
+                                                    ->color('primary')
+                                                    ->form([
+                                                        Forms\Components\Textarea::make('content')
+                                                            ->hiddenLabel()
+                                                            ->placeholder(Lorem::sentence(100))
+                                                            ->required()
+                                                            ->autosize()
+                                                    ])
+                                                    ->modalIcon('heroicon-s-pencil')
+                                                    ->modalHeading('Answer the Topic!')
+                                                    ->modalDescription('Tuliskan kesimpulan atau pendapatmu dari hasil diskusi pada kolom dibawah ini!')
+                                                    ->action(function (array $data, $record){
+                                                        if(
+                                                            Models\Answer::create([
+                                                                'content' => $data['content'],
+                                                                'topic_id' => $record->id,
+                                                                'student_id' => auth()->guard()->user()->id,
+                                                        ])){
+                                                            Notifications\Notification::make()
+                                                                ->title('Congrats!')
+                                                                ->body('Your answer has been submitted!')
+                                                                ->success()
+                                                                ->send();
+                                                            return;
+                                                        }
+                                                    }),
+                                                ])
+                                                ->fullWidth()
+                                                ->columnSpan(2)
+                                                ->visible(function ($record) {
+                                                    $userId = auth()->guard()->user()->id;
+                                                    return !$record->answers->where('student_id', $userId)->count() && $this->role() === 2;
+                                                }),
                                             Infolists\Components\RepeatableEntry::make('answers')
                                                 ->label('Answers')
                                                 ->schema([
@@ -181,11 +223,14 @@ class ViewClassroom extends Pages\ViewRecord
                                                         ->suffix(" (".$this->record->created_at->diffForHumans().")")
                                                         ->suffixActions([
                                                             Infolists\Components\Actions\Action::make('reply')
-                                                                ->icon('heroicon-s-arrow-uturn-left')
+                                                                ->icon(fn ($record) => $record->reply ? 'heroicon-s-pencil' : 'heroicon-s-arrow-uturn-left')
                                                                 ->iconButton()
                                                                 ->hiddenLabel()
                                                                 ->size(Enums\ActionSize::ExtraSmall)
                                                                 ->visible($this->role() === 1)
+                                                                ->fillForm(
+                                                                    fn ($record) => ['reply' => $record->reply]
+                                                                )
                                                                 ->form([
                                                                     Forms\Components\Textarea::make('reply')
                                                                         ->hiddenLabel()
@@ -193,9 +238,9 @@ class ViewClassroom extends Pages\ViewRecord
                                                                         ->required()
                                                                         ->autosize()
                                                                 ])
-                                                                ->modalIcon('heroicon-s-arrow-uturn-left')
-                                                                ->modalHeading('Reply the Answer!')
-                                                                ->modalDescription('Tuliskan timbal balik untuk jawaban tersebut disini!')
+                                                                ->modalIcon(fn ($record) => $record->reply === null ? 'heroicon-s-arrow-uturn-left' : 'heroicon-s-pencil')
+                                                                ->modalHeading(fn ($record) => $record->reply === null ? 'Balas Jawaban!' : 'Edit Jawaban!')
+                                                                ->modalDescription(fn ($record) => $record->reply === null ? 'Tuliskan balasan untuk jawaban tersebut disini!' : 'Edit balasan untuk jawaban tersebut disini!')
                                                                 ->action(function (array $data, $record){
                                                                     if(
                                                                         Models\Answer::where('id', $record->id)->update([
@@ -204,8 +249,8 @@ class ViewClassroom extends Pages\ViewRecord
                                                                         ])
                                                                     ){
                                                                         Notifications\Notification::make()
-                                                                            ->title('Congrats!')
-                                                                            ->body('Your reply has been submitted!')
+                                                                            ->title('Success!')
+                                                                            ->body('Reply has been sent!')
                                                                             ->success()
                                                                             ->send();
                                                                         return;
@@ -234,7 +279,7 @@ class ViewClassroom extends Pages\ViewRecord
                 
                                                                     return Notifications\Notification::make()
                                                                         ->title('Congrats!')
-                                                                        ->body('Answer has been updated!')
+                                                                        ->body('Answer has been changed!')
                                                                         ->success()
                                                                         ->send();
                                                                 })
@@ -243,25 +288,32 @@ class ViewClassroom extends Pages\ViewRecord
                                                                 ->modalDescription('Edit this answer!')
                                                                 ->modalWidth('2xl')
                                                                 ->visible(fn ($record) => auth()->guard()->user()->id === $record->student_id),
-                                                            Infolists\Components\Actions\Action::make('delete')
+                                                            Infolists\Components\Actions\Action::make($this->role() === 1 ? 'delete-reply' : 'delete-answer')
                                                                 ->icon('heroicon-s-trash')
                                                                 ->iconButton()
                                                                 ->hiddenLabel()
                                                                 ->color('danger')
                                                                 ->size(Enums\ActionSize::ExtraSmall)
                                                                 ->action(function ($record) {
-                                                                    Models\Answer::where('id', $record->id)->delete();
+                                                                    if($this->role() === 1){
+                                                                        Models\Answer::where('id', $record->id)->update([
+                                                                            'reply' => null,
+                                                                            'reply_from' => null,
+                                                                        ]);
+                                                                    }else{
+                                                                        Models\Answer::where('id', $record->id)->delete();
+                                                                    }
                                                                     return Notifications\Notification::make()
                                                                         ->title('Success!')
-                                                                        ->body('Answer has been deleted!')
+                                                                        ->body($this->role() === 1 ? 'Reply has been deleted!' : 'Answer has been deleted!')
                                                                         ->success()
                                                                         ->send();
                                                                 })
                                                                 ->requiresConfirmation()
-                                                                ->modalHeading('Delete Answer')
-                                                                ->modalDescription('Are you sure want to delete this answer?')
+                                                                ->modalHeading($this->role() === 1 ? 'Delete Reply' : 'Delete Answer')
+                                                                ->modalDescription('Are you sure want to delete this '. ($this->role() === 1 ? 'reply' : 'answer').'?')
                                                                 ->modalWidth('lg')
-                                                                ->visible(fn ($record) => auth()->guard()->user()->id === $record->student_id),
+                                                                ->visible(fn ($record) => $this->role() === 2 || $record->reply !== null),
                                                         ]),
                                                     Infolists\Components\TextEntry::make('content')
                                                         ->hiddenLabel()
@@ -274,52 +326,8 @@ class ViewClassroom extends Pages\ViewRecord
                                                         ->icon('heroicon-s-arrow-turn-down-right')
                                                         ->visible(fn ($record) => $record->reply)
                                                 ])
-                                                ->columnSpan(2),
-                                            Infolists\Components\Section::make('Answers')
-                                                ->icon('heroicon-s-chat-bubble-left-right')
-                                                ->iconColor('info')
-                                                ->headerActions([
-                                                    Infolists\Components\Actions\Action::make('answer-topic')
-                                                        ->hiddenLabel()
-                                                        ->icon('heroicon-s-pencil')
-                                                        ->color('warning')
-                                                        ->visible(function ($record) {
-                                                            $userId = auth()->guard()->user()->id;
-                                                            return !$record->answers->where('student_id', $userId)->count() && $this->role() === 2;
-                                                        })
-                                                        ->form([
-                                                            Forms\Components\Textarea::make('content')
-                                                                ->hiddenLabel()
-                                                                ->placeholder(Lorem::sentence(100))
-                                                                ->required()
-                                                                ->autosize()
-                                                        ])
-                                                        ->modalIcon('heroicon-s-pencil')
-                                                        ->modalHeading('Answer the Topic!')
-                                                        ->modalDescription('Tuliskan kesimpulan atau pendapatmu dari hasil diskusi pada kolom dibawah ini!')
-                                                        ->action(function (array $data, $record){
-                                                            if(
-                                                                Models\Answer::create([
-                                                                    'content' => $data['content'],
-                                                                    'topic_id' => $record->id,
-                                                                    'student_id' => auth()->guard()->user()->id,
-                                                            ])){
-                                                                Notifications\Notification::make()
-                                                                    ->title('Congrats!')
-                                                                    ->body('Your answer has been submitted!')
-                                                                    ->success()
-                                                                    ->send();
-                                                                return;
-                                                            }
-                                                        }),
-                                                ])
-                                                ->schema([
-                                                    
-                                                ])
-                                                ->collapsible()
-                                                ->collapsed()
                                                 ->columnSpan(2)
-                                                ->visible(fn ($record) => $this->role() === 2 || $record->answers->count() > 0),
+                                                ->visible(fn ($record) => $record->answers->count() > 0)
                                         ])
                                         ->columns(2)
                                     ])
