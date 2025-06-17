@@ -7,9 +7,7 @@ use App\Filament\Resources\ClassroomResource;
 use Faker\Provider\Lorem;
 use Filament\Forms;
 use Filament\Actions;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Filament\Notifications;
 use Filament\Support\Enums;
 use Filament\Resources\Pages;
@@ -24,7 +22,7 @@ class ViewClassroom extends Pages\ViewRecord
 
     protected static ?string $title = null;
 
-    public function getTitle(): string | Htmlable {   
+    public function getTitle(): string | Htmlable {
         if($this->record) {
             if($this->record->classroom) {
                 return $this->record->classroom->name;
@@ -170,10 +168,14 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->hiddenLabel()
                                                 ->visible(fn ($record) => Support\Str::contains($record->file, ['.mp4']))
                                                 ->columnSpan(2),
-                                            Infolists\Components\ViewEntry::make('talk')
-                                                ->alignCenter()
-                                                ->view('filament.infolists.entries.disqus')
-                                                ->hiddenLabel()
+                                            Infolists\Components\Actions::make([
+                                                Infolists\Components\Actions\Action::make('talk')
+                                                    ->hiddenLabel()
+                                                    ->icon('heroicon-s-chat-bubble-left-right')
+                                                    ->color('primary')
+                                                    ->url(fn ($record) => '/classrooms/topic/'.$record->id)
+                                                ])
+                                                ->fullWidth()
                                                 ->columnSpan(2),
                                             Infolists\Components\Actions::make([
                                                 Infolists\Components\Actions\Action::make('answer-topic')

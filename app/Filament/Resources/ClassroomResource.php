@@ -63,6 +63,7 @@ class ClassroomResource extends Resource
         return [
             'index' => Pages\ListClassrooms::route('/'),
             'view' => Pages\ViewClassroom::route('/{record}'),
+            'topic' => Pages\ViewTopic::route('/topic/{record}')
         ];
     }
 
