@@ -140,28 +140,141 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->alignEnd()
                                                 ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
                                                 ->since(),
-                                            Infolists\Components\Section::make([
-                                                Infolists\Components\TextEntry::make('description')
-                                                    ->hiddenLabel(),
-                                                Infolists\Components\Actions::make([
-                                                    Infolists\Components\Actions\Action::make('file')
-                                                        ->label(fn ($record) => Support\Str::replaceFirst(($this->role() === 1 ? $this->record->token : $this->record->classroom->token).'/','',$record->file))
-                                                        ->icon('heroicon-s-document-arrow-down')
-                                                        ->url(fn ($record) => '/storage/'.$record->file, true)
-                                                        ->visible(fn ($record) => Support\Str::contains($record->file, ['.pdf', '.zip'])),
-                                                ]),
-                                                Infolists\Components\ImageEntry::make('file')
-                                                    ->hiddenLabel()
+                                            Infolists\Components\TextEntry::make('description')
+                                                ->hiddenLabel()
+                                                ->columnSpan(2)
+                                                ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
+                                            Infolists\Components\Actions::make([
+                                                Infolists\Components\Actions\Action::make('file')
+                                                    ->label(fn ($record) => Support\Str::replaceFirst(($this->role() === 1 ? $this->record->token : $this->record->classroom->token).'/','',$record->file))
+                                                    ->icon('heroicon-s-document-arrow-down')
                                                     ->url(fn ($record) => '/storage/'.$record->file, true)
-                                                    ->size('100%')
-                                                    ->alignCenter()
-                                                    ->visible(fn ($record) => Support\Str::contains($record->file, ['.png', '.jpg', '.jpeg', '.gif'])),
-                                                Infolists\Components\ViewEntry::make('file')
-                                                    ->alignCenter()
-                                                    ->view('filament.infolists.entries.video-player')
-                                                    ->hiddenLabel()
-                                                    ->visible(fn ($record) => Support\Str::contains($record->file, ['.mp4']))
-                                            ]),
+                                                    ->visible(fn ($record) => Support\Str::contains($record->file, ['.pdf', '.zip'])),
+                                            ])
+                                            ->columnSpan(2),
+                                            Infolists\Components\ImageEntry::make('file')
+                                                ->hiddenLabel()
+                                                ->url(fn ($record) => '/storage/'.$record->file, true)
+                                                ->size('100%')
+                                                ->alignCenter()
+                                                ->visible(fn ($record) => Support\Str::contains($record->file, ['.png', '.jpg', '.jpeg', '.gif']))
+                                                ->columnSpan(2),
+                                            Infolists\Components\ViewEntry::make('file')
+                                                ->alignCenter()
+                                                ->view('filament.infolists.entries.video-player')
+                                                ->hiddenLabel()
+                                                ->visible(fn ($record) => Support\Str::contains($record->file, ['.mp4']))
+                                                ->columnSpan(2),
+                                            Infolists\Components\ViewEntry::make('talk')
+                                                ->alignCenter()
+                                                ->view('filament.infolists.entries.disqus')
+                                                ->hiddenLabel()
+                                                ->columnSpan(2),
+                                            Infolists\Components\RepeatableEntry::make('answers')
+                                                ->label('Answers')
+                                                ->schema([
+                                                    Infolists\Components\TextEntry::make('student.name')
+                                                        ->hiddenLabel()
+                                                        ->icon('heroicon-s-user')
+                                                        ->iconColor('info')
+                                                        ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
+                                                        ->suffix(" (".$this->record->created_at->diffForHumans().")")
+                                                        ->suffixActions([
+                                                            Infolists\Components\Actions\Action::make('reply')
+                                                                ->icon('heroicon-s-arrow-uturn-left')
+                                                                ->iconButton()
+                                                                ->hiddenLabel()
+                                                                ->size(Enums\ActionSize::ExtraSmall)
+                                                                ->visible($this->role() === 1)
+                                                                ->form([
+                                                                    Forms\Components\Textarea::make('reply')
+                                                                        ->hiddenLabel()
+                                                                        ->placeholder(Lorem::sentence(100))
+                                                                        ->required()
+                                                                        ->autosize()
+                                                                ])
+                                                                ->modalIcon('heroicon-s-arrow-uturn-left')
+                                                                ->modalHeading('Reply the Answer!')
+                                                                ->modalDescription('Tuliskan timbal balik untuk jawaban tersebut disini!')
+                                                                ->action(function (array $data, $record){
+                                                                    if(
+                                                                        Models\Answer::where('id', $record->id)->update([
+                                                                            'reply' => $data['reply'],
+                                                                            'reply_from' => auth()->guard()->user()->id,
+                                                                        ])
+                                                                    ){
+                                                                        Notifications\Notification::make()
+                                                                            ->title('Congrats!')
+                                                                            ->body('Your reply has been submitted!')
+                                                                            ->success()
+                                                                            ->send();
+                                                                        return;
+                                                                    }
+                                                                }),
+                                                            Infolists\Components\Actions\Action::make('edit')
+                                                                ->icon('heroicon-s-pencil-square')
+                                                                ->iconButton()
+                                                                ->hiddenLabel()
+                                                                ->color('warning')
+                                                                ->size(Enums\ActionSize::ExtraSmall)
+                                                                ->fillForm(
+                                                                    fn ($record) => ['content' => $record->content]
+                                                                )
+                                                                ->form([
+                                                                    Forms\Components\Textarea::make('content')
+                                                                        ->hiddenLabel()
+                                                                        ->required()
+                                                                        ->placeholder(Lorem::sentence(100))
+                                                                        ->autosize(),
+                                                                ])
+                                                                ->action(function (array $data,$record) {
+                                                                    Models\Answer::where('id', $record->id)->update([
+                                                                        'content' => $data['content']
+                                                                    ]);
+                
+                                                                    return Notifications\Notification::make()
+                                                                        ->title('Congrats!')
+                                                                        ->body('Answer has been updated!')
+                                                                        ->success()
+                                                                        ->send();
+                                                                })
+                                                                ->modalIcon('heroicon-s-pencil-square')
+                                                                ->modalHeading('Edit Answer')
+                                                                ->modalDescription('Edit this answer!')
+                                                                ->modalWidth('2xl')
+                                                                ->visible(fn ($record) => auth()->guard()->user()->id === $record->student_id),
+                                                            Infolists\Components\Actions\Action::make('delete')
+                                                                ->icon('heroicon-s-trash')
+                                                                ->iconButton()
+                                                                ->hiddenLabel()
+                                                                ->color('danger')
+                                                                ->size(Enums\ActionSize::ExtraSmall)
+                                                                ->action(function ($record) {
+                                                                    Models\Answer::where('id', $record->id)->delete();
+                                                                    return Notifications\Notification::make()
+                                                                        ->title('Success!')
+                                                                        ->body('Answer has been deleted!')
+                                                                        ->success()
+                                                                        ->send();
+                                                                })
+                                                                ->requiresConfirmation()
+                                                                ->modalHeading('Delete Answer')
+                                                                ->modalDescription('Are you sure want to delete this answer?')
+                                                                ->modalWidth('lg')
+                                                                ->visible(fn ($record) => auth()->guard()->user()->id === $record->student_id),
+                                                        ]),
+                                                    Infolists\Components\TextEntry::make('content')
+                                                        ->hiddenLabel()
+                                                        ->icon('heroicon-s-chat-bubble-left-ellipsis')
+                                                        ->iconColor('info')
+                                                        ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
+                                                    Infolists\Components\TextEntry::make('reply')
+                                                        ->label('Reply from Teacher')
+                                                        ->size(Infolists\Components\TextEntry\TextEntrySize::Medium)
+                                                        ->icon('heroicon-s-arrow-turn-down-right')
+                                                        ->visible(fn ($record) => $record->reply)
+                                                ])
+                                                ->columnSpan(2),
                                             Infolists\Components\Section::make('Answers')
                                                 ->icon('heroicon-s-chat-bubble-left-right')
                                                 ->iconColor('info')
@@ -179,10 +292,11 @@ class ViewClassroom extends Pages\ViewRecord
                                                                 ->hiddenLabel()
                                                                 ->placeholder(Lorem::sentence(100))
                                                                 ->required()
+                                                                ->autosize()
                                                         ])
                                                         ->modalIcon('heroicon-s-pencil')
                                                         ->modalHeading('Answer the Topic!')
-                                                        ->modalDescription('Remember! You can only fill in the answer once and it cannot be changed.')
+                                                        ->modalDescription('Tuliskan kesimpulan atau pendapatmu dari hasil diskusi pada kolom dibawah ini!')
                                                         ->action(function (array $data, $record){
                                                             if(
                                                                 Models\Answer::create([
@@ -200,33 +314,12 @@ class ViewClassroom extends Pages\ViewRecord
                                                         }),
                                                 ])
                                                 ->schema([
-                                                    Infolists\Components\RepeatableEntry::make('answers')
-                                                    ->hiddenLabel()
-                                                    ->schema([
-                                                        Infolists\Components\TextEntry::make('student.name')
-                                                            ->hiddenLabel()
-                                                            ->icon('heroicon-s-user')
-                                                            ->iconColor('info')
-                                                            ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall),
-                                                        Infolists\Components\TextEntry::make('created_at')
-                                                            ->hiddenLabel()
-                                                            ->icon('heroicon-s-clock')
-                                                            ->alignEnd()
-                                                            ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
-                                                            ->since(),
-                                                        Infolists\Components\TextEntry::make('content')
-                                                            ->hiddenLabel()
-                                                            ->icon('heroicon-s-chat-bubble-left-ellipsis')
-                                                            ->iconColor('info')
-                                                            ->columnSpan(2)
-                                                    ])
-                                                    ->columns([
-                                                        'xl' => 2,
-                                                        'sm' => 1,
-                                                    ])
+                                                    
                                                 ])
                                                 ->collapsible()
                                                 ->collapsed()
+                                                ->columnSpan(2)
+                                                ->visible(fn ($record) => $this->role() === 2 || $record->answers->count() > 0),
                                         ])
                                         ->columns(2)
                                     ])
@@ -249,7 +342,8 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->label('Topic Description')
                                                 ->required()
                                                 ->maxLength(255)
-                                                ->placeholder(Lorem::sentence(50)),
+                                                ->placeholder(Lorem::sentence(50))
+                                                ->autosize(),
                                             Forms\Components\FileUpload::make('file')
                                                 ->label('File')                                                        
                                                 ->required()
@@ -334,11 +428,12 @@ class ViewClassroom extends Pages\ViewRecord
                                                         ->maxLength(255)
                                                         ->placeholder('Programming Language')
                                                         ->autocapitalize('words'),
-                                                    Forms\Components\TextInput::make('description')
+                                                    Forms\Components\Textarea::make('description')
                                                         ->label('Topic Description')
                                                         ->required()
                                                         ->maxLength(255)
-                                                        ->placeholder(Lorem::sentence(10)),
+                                                        ->placeholder(Lorem::sentence(50))
+                                                        ->autosize(),
                                                     Forms\Components\FileUpload::make('file')
                                                         ->label('File')                                                        
                                                         ->required()
