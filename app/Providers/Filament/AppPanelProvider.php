@@ -55,6 +55,7 @@ class AppPanelProvider extends Filament\PanelProvider
             ])
             ->authMiddleware([
                 Middleware\Authenticate::class,
-            ]);
+            ])
+            ->breadcrumbs(false);
     }
 }

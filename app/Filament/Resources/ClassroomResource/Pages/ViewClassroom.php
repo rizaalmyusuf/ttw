@@ -173,7 +173,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                     ->hiddenLabel()
                                                     ->icon('heroicon-s-chat-bubble-left-right')
                                                     ->color('primary')
-                                                    ->url(fn ($record) => '/classrooms/topic/'.$record->id)
+                                                    ->url(fn ($record) => '/topics/'.$record->id)
                                                 ])
                                                 ->fullWidth()
                                                 ->columnSpan(2),
