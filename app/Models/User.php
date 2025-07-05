@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Models\Classroomable;
 use Filament\Panel;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent;
@@ -74,5 +75,22 @@ class User extends Authenticatable implements FilamentUser
     public function classrooms(): Eloquent\Relations\MorphToMany
     {
         return $this->morphToMany(Classroom::class, 'classroomable');
+    }
+
+    public static function notInClassroomId($classroomId){
+        return self::where('role', 2)
+            ->whereNot(function ($query) use ($classroomId) {
+                $query->whereIn('id', Classroomable::where('classroom_id', $classroomId)->pluck('classroomable_id'));
+        });
+    }
+
+    public function groups(): Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Group::class);
+    }
+
+    public function group(): Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Group::class);
     }
 }

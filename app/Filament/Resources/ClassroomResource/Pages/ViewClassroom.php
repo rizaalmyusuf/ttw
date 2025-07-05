@@ -486,45 +486,65 @@ class ViewClassroom extends Pages\ViewRecord
                                         ->modalHeading('Invite Student')
                                         ->modalDescription('Invite people to reach more student')
                                         ->form([
-                                            Forms\Components\TextInput::make('search')
-                                                ->label('Username or Email')
-                                                ->placeholder('\'muridtik\' or \'muridtik@ttw.id\'')
+                                            Forms\Components\CheckboxList::make('students')
+                                                ->label('Students')
+                                                ->options(Models\User::notInClassroomId($this->record->id)->pluck('name', 'users.id'))
                                                 ->required()
+                                                ->columns(3)
+                                                ->searchable()
+                                                ->bulkToggleable(),
+                                            Forms\Components\Select::make('assignGroup')
+                                                ->label('Assign Group')
+                                                ->placeholder('Select Group or Leave It Empty')
+                                                ->options(Models\Group::all()->pluck('name', 'id'))
+                                                ->searchable()
                                         ])
                                         ->action(function (array $data, $record){
-                                            if(Models\User::where('username', $data['search'])->first()){
-                                                $student = Models\User::where('username', $data['search'])->first();
-                                            }elseif (Models\User::where('email', $data['search'])->first()){
-                                                $student = Models\User::where('email', $data['search'])->first();
-                                            }else{
+                                            Models\Classroomable::inviteStudent(
+                                                Models\User::find($data['students']),
+                                                $record
+                                            );
+
+                                            return Notifications\Notification::make()
+                                                ->title('Congrats!')
+                                                ->body('Hoorayy, There are now students of this classroom!')
+                                                ->success()
+                                                ->send();
+                                        }),
+                                    Infolists\Components\Actions\Action::make('makeGroup')
+                                        ->label('Make Group')
+                                        ->icon('heroicon-s-user-group')
+                                        ->modalIcon('heroicon-s-user-group')
+                                        ->modalHeading('Make Group')
+                                        ->modalDescription('Make group to organize students')
+                                        ->form([
+                                            Forms\Components\TextInput::make('name')
+                                                ->label('Group Name')
+                                                ->placeholder('Kelompok 7')
+                                                ->required(),
+                                        ])
+                                        ->action(function (array $data, $record){
+                                            if(Models\Group::where('name', $data['name'])->first()){
                                                 return Notifications\Notification::make()
                                                     ->title('Failed!')
-                                                    ->body('Ouh no, people not found!')
+                                                    ->body('Ouh no, group with that name already exists! Try another name!')
                                                     ->danger()
                                                     ->send();
-                                            };
-
-                                            if(Models\Classroomable::where(['classroom_id' => $record->id,'classroomable_id' => $student->id])->first()){
-                                                return Notifications\Notification::make()
-                                                    ->title('Failed!')
-                                                    ->body('Don\'t worry, '.$student->name.' is already a student of this classroom!')
-                                                    ->warning()
-                                                    ->send();
                                             }else{
-                                                Models\Classroomable::create([
-                                                    'classroom_id' => $record->id,
-                                                    'classroomable_id' => $student->id,
-                                                    'classroomable_type' => 'App\Models\User'
+                                                Models\Group::create([
+                                                    'name' => $data['name'],
+                                                    'classroom_id' => $record->id
                                                 ]);
 
                                                 return Notifications\Notification::make()
                                                     ->title('Congrats!')
-                                                    ->body('Hoorayy, '.$student->name.' is now a student of this classroom!')
+                                                    ->body('Hoorayy, '.$data['name'].' is now a group in this classroom!')
                                                     ->success()
                                                     ->send();
                                             }
-                                        }),
+                                        })
                                 ])
+                                ->columns(2)
                                 ->fullWidth()
                                 ->visible(fn () => $this->role() === 1),
                                 Infolists\Components\RepeatableEntry::make(($this->role() === 2 ? 'classroom.' : '').'students')
@@ -540,8 +560,22 @@ class ViewClassroom extends Pages\ViewRecord
                                             ->icon('heroicon-s-envelope')
                                             ->iconColor('info')
                                             ->visible(fn () => $this->role() === 1),
+                                        Infolists\Components\Actions::make([
+                                            Infolists\Components\Actions\Action::make('kick')
+                                                ->hiddenLabel()
+                                                ->icon('heroicon-s-user-minus')
+                                                ->color('danger')
+                                                ->size(Enums\ActionSize::ExtraSmall)
+                                                ->requiresConfirmation()
+                                                ->modalHeading('Kick Student')
+                                                ->modalDescription('Are you sure want to kick this student?')
+                                                ->modalWidth('lg')
+                                                ->action(fn ($record) => Models\Classroomable::kickStudent($record))
+                                                ->visible(fn () => $this->role() === 1),
+                                        ])
+                                        ->alignEnd()
                                     ])
-                                    ->columns(2)
+                                    ->columns(3)
                             ])
                     ])
                     ->columnSpan(2)

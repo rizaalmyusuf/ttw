@@ -31,4 +31,22 @@ class Classroomable extends Eloquent\Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public static function inviteStudent($users, Classroom $classroom): bool
+    {
+        foreach($users as $user){
+            self::create([
+                'classroom_id' => $classroom->id,
+                'classroomable_id' => $user->id,
+                'classroomable_type' => User::class,
+            ]);
+        }
+
+        return true;
+    }
+
+    public static function kickStudent(User $user): bool
+    {
+        return self::where('classroomable_id', $user->id)->delete();
+    }
 }
