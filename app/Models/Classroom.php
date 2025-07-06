@@ -42,4 +42,9 @@ class Classroom extends Eloquent\Model
     {
         return $this->hasMany(Topic::class);
     }
+
+    public function groups(): Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Group::class);
+    }
 }

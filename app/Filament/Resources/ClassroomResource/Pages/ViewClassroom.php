@@ -475,6 +475,130 @@ class ViewClassroom extends Pages\ViewRecord
                                     ])
                                     ->columns(2)
                             ]),
+                        Infolists\Components\Tabs\Tab::make('Groups')
+                            ->icon('heroicon-s-user-group')
+                            ->schema([
+                                Infolists\Components\Actions::make([
+                                    Infolists\Components\Actions\Action::make('makeGroup')
+                                        ->label('Make Group')
+                                        ->icon('heroicon-s-squares-plus')
+                                        ->modalIcon('heroicon-s-squares-plus')
+                                        ->modalHeading('Make Group')
+                                        ->modalDescription('Make group to organize students')
+                                        ->form([
+                                            Forms\Components\TextInput::make('name')
+                                                ->label('Group Name')
+                                                ->placeholder('Kelompok 7')
+                                                ->maxLength(24)
+                                                ->autocapitalize('words')
+                                                ->required(),
+                                            Forms\Components\CheckboxList::make('assignStudents')
+                                                ->label('Assign Students')
+                                                ->options(
+                                                    // Models\User::notInClassroomId($this->record->id)->pluck('name', 'users.id')
+                                                    Models\User::findUngroupedStudents($this->record)->pluck('name', 'id')
+                                                )
+                                                ->columns(3)
+                                                ->searchable()
+                                                ->bulkToggleable(),
+
+                                        ])
+                                        ->action(function (array $data, $record){
+                                            $data['code'] = $record->token.'_'.Support\Str::slug($data['name']);
+                                            if(Models\Group::where('code', $data['code'])->first()){
+                                                return Notifications\Notification::make()
+                                                    ->title('Failed!')
+                                                    ->body('Ouh no, group with that name already exists! Try another name!')
+                                                    ->danger()
+                                                    ->send();
+                                            }else{
+                                                Models\Group::makeGroup($data, $record);
+
+                                                if(!empty($data['assignStudents'])){
+                                                    Models\Groupable::assignStudents($data['assignStudents']);
+                                                }
+
+                                                return Notifications\Notification::make()
+                                                    ->title('Congrats!')
+                                                    ->body('Hoorayy, '.$data['name'].' is now a group in this classroom!')
+                                                    ->success()
+                                                    ->send();
+                                            }
+                                        })
+                                ])
+                                ->fullWidth()
+                                ->visible(fn () => $this->role() === 1),
+                                Infolists\Components\RepeatableEntry::make(($this->role() === 2 ? 'classroom.' : '').'groups')
+                                    ->hiddenLabel()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('name')
+                                            ->hiddenLabel()
+                                            ->icon('heroicon-s-user-group')
+                                            ->iconColor('info')
+                                            ->weight(Enums\FontWeight::Bold)
+                                            ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
+                                        Infolists\Components\TextEntry::make('created_at')
+                                            ->hiddenLabel()
+                                            ->icon('heroicon-s-clock')     
+                                            ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
+                                            ->alignEnd()
+                                            ->since()
+                                            ->visible(fn () => $this->role() === 2),
+                                        Infolists\Components\Actions::make([
+                                            Infolists\Components\Actions\Action::make('delete')
+                                                ->icon('heroicon-s-trash')
+                                                ->color('danger')
+                                                ->action(function ($record) {
+                                                    Models\Group::where('id', $record->id)->delete();
+                                                    return Notifications\Notification::make()
+                                                        ->title('Success!')
+                                                        ->body('Group has been deleted!')
+                                                        ->success()
+                                                        ->send();
+                                                })
+                                                ->requiresConfirmation()
+                                                ->modalHeading('Delete Group')
+                                                ->modalDescription('Are you sure want to delete this group?')
+                                                ->modalWidth('lg'),
+                                            Infolists\Components\Actions\Action::make('edit')
+                                                ->icon('heroicon-s-pencil-square')
+                                                ->color('warning')
+                                                ->fillForm(
+                                                    fn ($record) => [
+                                                        'name' => $record->name,
+                                                    ]
+                                                )
+                                                ->form([
+                                                    Forms\Components\TextInput::make('name')
+                                                        ->label('Group Name')
+                                                        ->placeholder('Kelompok 7')
+                                                        ->maxLength(24)
+                                                        ->autocapitalize('words')
+                                                        ->required(),
+                                                ])
+                                                ->action(function (array $data,$record) {
+                                                    Models\Topic::where('id', $record->id)->update([
+                                                        'title' => $data['title'],
+                                                        'description' => $data['description'],
+                                                        'file' => $data['file'],
+                                                    ]);
+
+                                                    return Notifications\Notification::make()
+                                                        ->title('Congrats!')
+                                                        ->body('Topic has been updated!')
+                                                        ->success()
+                                                        ->send();
+                                                })
+                                                ->modalIcon('heroicon-s-pencil-square')
+                                                ->modalHeading('Edit Topic')
+                                                ->modalDescription('Edit this topic!')
+                                                ->modalWidth('2xl'),
+                                            ])
+                                            ->alignEnd()
+                                            ->visible(fn () => $this->role() === 1)
+                                    ])
+                                    ->columns(2)
+                            ]),
                         Infolists\Components\Tabs\Tab::make('Students')
                             ->icon('heroicon-s-users')
                             ->schema([
@@ -496,14 +620,23 @@ class ViewClassroom extends Pages\ViewRecord
                                             Forms\Components\Select::make('assignGroup')
                                                 ->label('Assign Group')
                                                 ->placeholder('Select Group or Leave It Empty')
-                                                ->options(Models\Group::all()->pluck('name', 'id'))
+                                                ->options(
+                                                    Models\Group::getOnlyInside($this->record)->pluck('name', 'id')
+                                                )
                                                 ->searchable()
                                         ])
                                         ->action(function (array $data, $record){
-                                            Models\Classroomable::inviteStudent(
-                                                Models\User::find($data['students']),
-                                                $record
-                                            );
+                                            $students = Models\User::find($data['students']);
+
+                                            Models\Classroomable::inviteStudent($students,$record);
+
+                                            if($data['assignGroup'] !== null){
+                                                Models\Group::assignGroup(
+                                                    $students,
+                                                    Models\Group::find($data['assignGroup']),
+                                                    $record
+                                                );
+                                            }
 
                                             return Notifications\Notification::make()
                                                 ->title('Congrats!')
@@ -511,40 +644,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->success()
                                                 ->send();
                                         }),
-                                    Infolists\Components\Actions\Action::make('makeGroup')
-                                        ->label('Make Group')
-                                        ->icon('heroicon-s-user-group')
-                                        ->modalIcon('heroicon-s-user-group')
-                                        ->modalHeading('Make Group')
-                                        ->modalDescription('Make group to organize students')
-                                        ->form([
-                                            Forms\Components\TextInput::make('name')
-                                                ->label('Group Name')
-                                                ->placeholder('Kelompok 7')
-                                                ->required(),
-                                        ])
-                                        ->action(function (array $data, $record){
-                                            if(Models\Group::where('name', $data['name'])->first()){
-                                                return Notifications\Notification::make()
-                                                    ->title('Failed!')
-                                                    ->body('Ouh no, group with that name already exists! Try another name!')
-                                                    ->danger()
-                                                    ->send();
-                                            }else{
-                                                Models\Group::create([
-                                                    'name' => $data['name'],
-                                                    'classroom_id' => $record->id
-                                                ]);
-
-                                                return Notifications\Notification::make()
-                                                    ->title('Congrats!')
-                                                    ->body('Hoorayy, '.$data['name'].' is now a group in this classroom!')
-                                                    ->success()
-                                                    ->send();
-                                            }
-                                        })
                                 ])
-                                ->columns(2)
                                 ->fullWidth()
                                 ->visible(fn () => $this->role() === 1),
                                 Infolists\Components\RepeatableEntry::make(($this->role() === 2 ? 'classroom.' : '').'students')
@@ -571,8 +671,8 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->modalDescription('Are you sure want to kick this student?')
                                                 ->modalWidth('lg')
                                                 ->action(fn ($record) => Models\Classroomable::kickStudent($record))
-                                                ->visible(fn () => $this->role() === 1),
                                         ])
+                                        ->visible(fn () => $this->role() === 1)
                                         ->alignEnd()
                                     ])
                                     ->columns(3)
