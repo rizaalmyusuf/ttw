@@ -76,9 +76,9 @@ class User extends Authenticatable implements FilamentUser
         return $this->morphToMany(Classroom::class, 'classroomable');
     }
 
-    public function groups(): Eloquent\Relations\MorphToMany
+    public function groups(): Eloquent\Relations\BelongsToMany
     {
-        return $this->morphToMany(Group::class, 'groupable');
+        return $this->belongsToMany(Group::class);
     }
 
     public static function notInClassroomId($classroomId){
@@ -92,6 +92,6 @@ class User extends Authenticatable implements FilamentUser
     {
         return self::where('role', 2)
             ->whereIn('id', Classroomable::where('classroom_id', $classroom->id)->pluck('classroomable_id'))
-            ->whereNotIn('id', Groupable::whereIn('group_id', $classroom->groups()->pluck('id'))->pluck('groupable_id'));
+            ->whereNotIn('id', GroupUser::whereIn('group_id', $classroom->groups()->pluck('id'))->pluck('user_id'));
     }
 }

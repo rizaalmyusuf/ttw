@@ -45,8 +45,9 @@ class Classroomable extends Eloquent\Model
         return true;
     }
 
-    public static function kickStudent(User $user): bool
+    public static function kickStudent(User $user, Classroom $classroom): bool
     {
+        GroupUser::where('user_id', $user->id)->whereIn('group_id', $classroom->groups->pluck('id'))->delete();
         return self::where('classroomable_id', $user->id)->delete();
     }
 }

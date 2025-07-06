@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('groupables', function (Blueprint $table) {
+        Schema::create('group_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('group_id')->constrained('groups')->cascadeOnDelete();
-            $table->foreignId('groupable_id')->constrained('users')->cascadeOnDelete();
-            $table->string('groupable_type');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('groupables');
+        Schema::dropIfExists('group_user');
     }
 };

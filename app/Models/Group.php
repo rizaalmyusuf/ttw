@@ -21,9 +21,9 @@ class Group extends Eloquent\Model
         return $this->belongsTo(Classroom::class, 'classroom_id');
     }
 
-    public function students(): Eloquent\Relations\MorphToMany
+    public function students(): Eloquent\Relations\BelongsToMany
     {
-        return $this->morphedByMany(User::class, 'groupable')->groupBy('groupable_id');
+        return $this->belongsToMany(User::class);
     }
 
     public static function getOnlyInside(Classroom $classroom){
