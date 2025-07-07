@@ -279,7 +279,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                                     Models\Answer::where('id', $record->id)->update([
                                                                         'content' => $data['content']
                                                                     ]);
-                
+
                                                                     return Notifications\Notification::make()
                                                                         ->title('Congrats!')
                                                                         ->body('Answer has been changed!')
@@ -353,7 +353,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->required()
                                                 ->placeholder(Lorem::sentence(50)),
                                             Forms\Components\FileUpload::make('file')
-                                                ->label('File')                                                        
+                                                ->label('File')
                                                 ->required()
                                                 ->maxSize(8192)
                                                 ->preserveFilenames()
@@ -382,7 +382,7 @@ class ViewClassroom extends Pages\ViewRecord
                                         ->modalIcon('heroicon-s-plus')
                                         ->modalHeading('Add Topic')
                                         ->modalDescription('Add a new topic to this classroom!')
-                                        ->modalWidth('screen')
+                                        ->modalWidth('7xl')
                                 ])
                                 ->fullWidth()
                                 ->visible(fn () => $this->role() === 1),
@@ -397,7 +397,7 @@ class ViewClassroom extends Pages\ViewRecord
                                             ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
                                         Infolists\Components\TextEntry::make('created_at')
                                             ->hiddenLabel()
-                                            ->icon('heroicon-s-clock')     
+                                            ->icon('heroicon-s-clock')
                                             ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
                                             ->alignEnd()
                                             ->since()
@@ -440,7 +440,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                         ->required()
                                                         ->placeholder(Lorem::sentence(50)),
                                                     Forms\Components\FileUpload::make('file')
-                                                        ->label('File')                                                        
+                                                        ->label('File')
                                                         ->required()
                                                         ->maxSize(5120)
                                                         ->preserveFilenames()
@@ -463,7 +463,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->modalIcon('heroicon-s-pencil-square')
                                                 ->modalHeading('Edit Topic')
                                                 ->modalDescription('Edit this topic!')
-                                                ->modalWidth('screen'),
+                                                ->modalWidth('7xl'),
                                             ])
                                             ->alignEnd()
                                             ->visible(fn () => $this->role() === 1)
@@ -534,7 +534,6 @@ class ViewClassroom extends Pages\ViewRecord
                                                     ->weight(Enums\FontWeight::Bold),
                                             ])
                                             ->contained(false)
-                                            // ->columns(3)
                                     ]),
                                 Infolists\Components\RepeatableEntry::make(($this->role() === 2 ? 'classroom.' : '').'groups')
                                     ->hiddenLabel()
@@ -677,7 +676,7 @@ class ViewClassroom extends Pages\ViewRecord
                                 ->fullWidth()
                                 ->visible(fn () => $this->role() === 1),
                                 Infolists\Components\RepeatableEntry::make(($this->role() === 2 ? 'classroom.' : '').'students')
-                                    ->hiddenLabel()    
+                                    ->hiddenLabel()
                                     ->schema([
                                         Infolists\Components\TextEntry::make('name')
                                             ->hiddenLabel()
