@@ -223,7 +223,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                         ->icon('heroicon-s-user')
                                                         ->iconColor('info')
                                                         ->size(Infolists\Components\TextEntry\TextEntrySize::ExtraSmall)
-                                                        ->suffix(" (".$this->record->created_at->diffForHumans().")")
+                                                        ->suffix(fn ($record) => Models\GroupUser::findGroupName($record) === null ? "" : " (Kelompok ".Models\GroupUser::findGroupName($record).")")
                                                         ->suffixActions([
                                                             Infolists\Components\Actions\Action::make('reply')
                                                                 ->icon(fn ($record) => $record->reply ? 'heroicon-s-pencil' : 'heroicon-s-arrow-uturn-left')
@@ -521,6 +521,21 @@ class ViewClassroom extends Pages\ViewRecord
                                     ])
                                     ->fullWidth()
                                     ->visible(fn () => $this->role() === 1),
+                                Infolists\Components\Fieldset::make('ungrouped-students')
+                                    ->label('Ungrouped Students')
+                                    ->schema([
+                                        Infolists\Components\RepeatableEntry::make(($this->role() === 2 ? 'classroom.' : '').'findUngroupedStudents')
+                                            ->hiddenLabel()
+                                            ->schema([
+                                                Infolists\Components\TextEntry::make('name')
+                                                    ->hiddenLabel()
+                                                    ->icon('heroicon-s-user')
+                                                    ->iconColor('info')
+                                                    ->weight(Enums\FontWeight::Bold),
+                                            ])
+                                            ->contained(false)
+                                            // ->columns(3)
+                                    ]),
                                 Infolists\Components\RepeatableEntry::make(($this->role() === 2 ? 'classroom.' : '').'groups')
                                     ->hiddenLabel()
                                     ->schema([
@@ -691,6 +706,7 @@ class ViewClassroom extends Pages\ViewRecord
                                     ])
                                     ->columns(3)
                             ])
+                            ->visible(fn () => $this->role() === 1)
                     ])
                     ->columnSpan(2)
                     ->persistTab()

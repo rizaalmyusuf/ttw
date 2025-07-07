@@ -47,4 +47,12 @@ class Classroom extends Eloquent\Model
     {
         return $this->hasMany(Group::class);
     }
+
+    public function findUngroupedStudents()
+    {
+        $groupedUserIds = GroupUser::whereIn('group_id', $this->groups()->pluck('id'))->pluck('user_id');
+        return $this->morphedByMany(User::class, 'classroomable')
+            ->whereNotIn('users.id',$groupedUserIds)
+            ->groupBy('classroomable_id');
+    }
 }

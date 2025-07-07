@@ -51,7 +51,8 @@ class ViewTopic extends ViewRecord
             ->schema([
                 Infolists\Components\TextEntry::make('description')
                     ->hiddenLabel()
-                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
+                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
+                    ->markdown(),
                 Infolists\Components\Actions::make([
                     Infolists\Components\Actions\Action::make('file')
                         ->label(fn ($record) => Support\Str::replaceFirst(($this->role() === 1 ? $this->record->token : $this->record->classroom->token).'/','',$record->file))

@@ -84,4 +84,12 @@ class GroupUser extends Eloquent\Model
             ]);
         }
     }
+
+    public static function findGroupName($record): string|null
+    {
+        $studentId = $record->student_id;
+        $groups = self::where('user_id', $studentId)->get();
+        $groupNames = $groups->pluck('group.name')->unique();
+        return $groupNames->first();
+    }
 }
