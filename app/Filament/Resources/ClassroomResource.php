@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Models;
-use App\Filament\Resources\ClassroomResource\Pages;
 use Filament\Tables;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
@@ -61,8 +60,8 @@ class ClassroomResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListClassrooms::route('/'),
-            'view' => Pages\ViewClassroom::route('/{record}'),
+            'index' => ClassroomResource\Pages\ListClassrooms::route('/'),
+            'view' => ClassroomResource\Pages\ViewClassroom::route('/{record}'),
         ];
     }
 

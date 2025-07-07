@@ -41,7 +41,7 @@ class ViewTopic extends ViewRecord
             Actions\Action::make('backToClassroom')
                 ->label('Back to Classroom')
                 ->icon('heroicon-s-arrow-left')
-                ->url('/classrooms/'.$this->record->classroom_id),
+                ->url('/classrooms/'.($this->role() === 1 ? $this->record->classroom_id : Models\Classroomable::where('classroomable_id', auth()->guard()->user()->id)->first()->id)),
         ];
     }
 

@@ -146,7 +146,8 @@ class ViewClassroom extends Pages\ViewRecord
                                             Infolists\Components\TextEntry::make('description')
                                                 ->hiddenLabel()
                                                 ->columnSpan(2)
-                                                ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
+                                                ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
+                                                ->markdown(),
                                             Infolists\Components\Actions::make([
                                                 Infolists\Components\Actions\Action::make('file')
                                                     ->label(fn ($record) => Support\Str::replaceFirst(($this->role() === 1 ? $this->record->token : $this->record->classroom->token).'/','',$record->file))
@@ -346,14 +347,11 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->label('Topic Title')
                                                 ->required()
                                                 ->maxLength(255)
-                                                ->placeholder('Programming Language')
-                                                ->autocapitalize('words'),
-                                            Forms\Components\Textarea::make('description')
+                                                ->placeholder('Programming Language'),
+                                            Forms\Components\MarkdownEditor::make('description')
                                                 ->label('Topic Description')
                                                 ->required()
-                                                ->maxLength(255)
-                                                ->placeholder(Lorem::sentence(50))
-                                                ->autosize(),
+                                                ->placeholder(Lorem::sentence(50)),
                                             Forms\Components\FileUpload::make('file')
                                                 ->label('File')                                                        
                                                 ->required()
@@ -384,7 +382,7 @@ class ViewClassroom extends Pages\ViewRecord
                                         ->modalIcon('heroicon-s-plus')
                                         ->modalHeading('Add Topic')
                                         ->modalDescription('Add a new topic to this classroom!')
-                                        ->modalWidth('2xl')
+                                        ->modalWidth('screen')
                                 ])
                                 ->fullWidth()
                                 ->visible(fn () => $this->role() === 1),
@@ -436,14 +434,11 @@ class ViewClassroom extends Pages\ViewRecord
                                                         ->label('Topic Title')
                                                         ->required()
                                                         ->maxLength(255)
-                                                        ->placeholder('Programming Language')
-                                                        ->autocapitalize('words'),
-                                                    Forms\Components\Textarea::make('description')
+                                                        ->placeholder('Programming Language'),
+                                                    Forms\Components\MarkdownEditor::make('description')
                                                         ->label('Topic Description')
                                                         ->required()
-                                                        ->maxLength(255)
-                                                        ->placeholder(Lorem::sentence(50))
-                                                        ->autosize(),
+                                                        ->placeholder(Lorem::sentence(50)),
                                                     Forms\Components\FileUpload::make('file')
                                                         ->label('File')                                                        
                                                         ->required()
@@ -468,7 +463,7 @@ class ViewClassroom extends Pages\ViewRecord
                                                 ->modalIcon('heroicon-s-pencil-square')
                                                 ->modalHeading('Edit Topic')
                                                 ->modalDescription('Edit this topic!')
-                                                ->modalWidth('2xl'),
+                                                ->modalWidth('screen'),
                                             ])
                                             ->alignEnd()
                                             ->visible(fn () => $this->role() === 1)

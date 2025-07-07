@@ -32,6 +32,7 @@ class AppPanelProvider extends Filament\PanelProvider
                 'danger' => '#E76F51',
             ])
             ->font('Montserrat')
+            ->darkMode(false)
             ->brandName('TTW App')
             ->brandLogo(asset('img/ttw.svg'))
             ->sidebarCollapsibleOnDesktop()
